@@ -1,0 +1,22 @@
+"DOTAAbilities" {
+	"axe_r" {
+		"BaseClass" "ability_lua"
+		"ScriptFile" "abilities/axe/axe_r"
+		"AbilityType" "DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityTextureName" "undying_decay"
+		"AbilityCooldown" "16.0"
+		"Damage" "4"
+
+		"TargetingIndicator" {
+			"Type" "TARGETING_INDICATOR_THICK_LINE"
+			"MaxLength" "1600"
+			"MinLength" "1600"
+			"Width" "225"
+		}
+
+		"precache" {
+			"particle" "particles/axe_r/axe_r.vpcf"
+		}
+	}
+}

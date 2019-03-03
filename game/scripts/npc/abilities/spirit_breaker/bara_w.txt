@@ -1,0 +1,9 @@
+"DOTAAbilities" {
+	"bara_w" {
+		"BaseClass" "ability_lua"
+		"ScriptFile" "abilities/bara/bara_w"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityTextureName" "spirit_breaker_nether_strike"
+		"AbilityCooldown" "5.0"
+	}
+}

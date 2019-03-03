@@ -1,0 +1,22 @@
+"DOTAAbilities" {
+	"bara_q" {
+		"BaseClass" "ability_lua"
+		"ScriptFile" "abilities/bara/bara_q"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityTextureName" "arc_warden_flux"
+		"AbilityCooldown" "3.5"
+		"AbilityCastPoint" "0.15"
+		"Damage" "2"
+
+		"TargetingIndicator" {
+			"Type" "TARGETING_INDICATOR_LINE"
+			"MinLength" "1200"
+			"MaxLength" "1200"
+		}
+
+		"HoverIndicator" {
+			"Type" "TARGETING_INDICATOR_RANGE"
+			"Radius" "1200"
+		}
+	}
+}

@@ -1,0 +1,20 @@
+"DOTAAbilities" {
+	"axe_w" {
+		"BaseClass" "ability_lua"
+		"ScriptFile" "abilities/axe/axe_w"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName" "antimage_spell_shield"
+		"AbilityCooldown" "4.0"
+		"AbilityCastPoint" "0.15"
+
+		"HoverIndicator" {
+			"Type" "TARGETING_INDICATOR_RANGE"
+			"Radius" "300"
+		}
+
+		"precache" {
+			"particle" "particles/axe_w/axe_w.vpcf"
+			"particle" "particles/axe_w/axe_w_bonus.vpcf"
+		}
+	}
+}

@@ -1,0 +1,11 @@
+"DOTAAbilities" {
+	"bara_a" {
+		"BaseClass" "ability_lua"
+		"ScriptFile" "abilities/bara/bara_a"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityTextureName" "spirit_breaker_greater_bash"
+		"AbilityCooldown" "0.6"
+		"AbilityCastPoint" "0.135"
+		"Damage" "1"
+	}
+}

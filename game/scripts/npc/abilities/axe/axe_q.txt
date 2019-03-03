@@ -1,0 +1,26 @@
+"DOTAAbilities" {
+	"axe_q" {
+		"BaseClass" "ability_lua"
+		"ScriptFile" "abilities/axe/axe_q"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityTextureName" "queenofpain_shadow_strike"
+		"AbilityCooldown" "4.0"
+		"AbilityCastPoint" "0.15"
+		"Damage" "2"
+
+		"TargetingIndicator" {
+			"Type" "TARGETING_INDICATOR_LINE"
+			"MinLength" "950"
+			"MaxLength" "950"
+		}
+
+		"HoverIndicator" {
+			"Type" "TARGETING_INDICATOR_RANGE"
+			"Radius" "950"
+		}
+
+		"precache" {
+			"particle" "particles/axe_q/axe_q.vpcf"
+		}
+	}
+}

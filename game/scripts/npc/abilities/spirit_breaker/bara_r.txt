@@ -1,0 +1,12 @@
+"DOTAAbilities" {
+	"bara_r" {
+		"BaseClass" "ability_lua"
+		"ScriptFile" "abilities/bara/bara_r"
+		"AbilityType" "DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName" "sven_gods_strength"
+		"AbilityCooldown" "10.0"
+		"AbilityCastPoint" "0.2"
+		"Damage" "4"
+	}
+}

@@ -1,0 +1,16 @@
+"DOTAAbilities" {
+	"bara_e" {
+		"BaseClass" "ability_lua"
+		"ScriptFile" "abilities/bara/bara_e"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityTextureName" "spirit_breaker_charge_of_darkness"
+		"AbilityCooldown" "6"
+		"AbilityCastPoint" "0.2"
+		"Damage" "3"
+
+		"HoverIndicator" {
+			"Type" "TARGETING_INDICATOR_RANGE"
+			"Radius" "2000"
+		}
+	}
+}
