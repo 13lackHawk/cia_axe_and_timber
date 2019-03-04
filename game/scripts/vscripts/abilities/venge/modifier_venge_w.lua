@@ -39,13 +39,13 @@ function modifier_venge_w:GetEffectAttachType()
     return PATTACH_ABSORIGIN_FOLLOW
 end
 
-function modifier_venge_w:OnDamageReceived(_, _, amount, isPhysical)
+function modifier_venge_w:GetDamageChange(_, _, amount, isPhysical)
     if isPhysical then
-        return amount + 1
+        return 1
     end
 end
 
-function modifier_venge_w:OnDamageReceivedPriority()
+function modifier_venge_w:GetDamageChangePriority()
     return PRIORITY_AMPLIFY_DAMAGE
 end
 

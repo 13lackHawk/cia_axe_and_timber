@@ -40,10 +40,10 @@ function modifier_ursa_r:AllowAbilityEffect(source)
     return source.owner.team == self:GetParent():GetParentEntity().owner.team
 end
 
-function modifier_ursa_r:OnDamageReceived()
+function modifier_ursa_r:GetDamageChange()
     return false
 end
 
-function modifier_ursa_r:OnDamageReceivedPriority()
+function modifier_ursa_r:GetDamageChangePriority()
     return PRIORITY_ABSOLUTE_SHIELD
 end

@@ -36,7 +36,7 @@ function sk_e:OnSpellStart()
         filter = Filters.Line(casterPos, target, 64),
         filterProjectiles = true,
         damage = self:GetDamage(),
-        action = function(target)
+        modifier = function(target)
             SKUtil.AbilityHit(hero, target)
         end
     })

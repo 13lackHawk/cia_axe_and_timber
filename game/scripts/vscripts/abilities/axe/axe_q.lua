@@ -18,18 +18,21 @@ function axe_q:OnSpellStart()
         distance = 950,
         damagesTrees = true,
         hitSound = "Arena.Axe.HitQ",
-        hitFunction = function(projectile, victim)
-            if not instanceof(victim, Obstacle) then
-                hitSomething = true
-            end
-            if instanceof(victim, Hero) then
-                --local distance = (victim:GetPos() - hero:GetPos()):Length2D()
-                --if distance <= 200 then
-                --    damage = damage * 2
-                --end
-                victim:AddNewModifier(projectile:GetTrueHero(), self, "modifier_axe_q", { duration = 1.5 })
-            end
-            victim:Damage(hero, damage)
+        hitParams = function(projectile, victim)
+            return {
+                ability = self,
+                modifier = function(victim)
+                    if instanceof(victim, Hero) then
+                        victim:AddNewModifier(projectile:GetTrueHero(), self, "modifier_axe_q", { duration = 1.5 })
+                    end
+                end,
+                damage = self:GetDamage(),
+                action = function(victim)
+                    if not instanceof(victim, Obstacle) then
+                        hitSomething = true
+                    end
+                end
+            }
         end,
         destroyFunction = function()
             if hitSomething == true then

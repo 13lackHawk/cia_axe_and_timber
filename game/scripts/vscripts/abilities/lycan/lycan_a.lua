@@ -21,16 +21,17 @@ function lycan_a:OnSpellStart()
         filter = Filters.Cone(pos, range, forward, math.pi),
         sound = "Arena.Lycan.HitA",
         damagesTrees = true,
-        action = function(target)
+        damage = function(target)
             local dmg = damage
 
             if LycanUtil.IsTransformed(hero) and LycanUtil.IsBleeding(target) then
                 dmg = dmg * 2
             end
 
+            return dmg
+        end,
+        modifier = function(target)
             LycanUtil.MakeBleed(hero, target)
-
-            target:Damage(hero, dmg, true)
         end,
         knockback = { force = 20, decrease = 3 },
         isPhysical = true

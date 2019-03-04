@@ -62,7 +62,7 @@ function zeus_q:OnSpellStart()
             ability = self,
             filter = Filters.Area(target, 175),
             damage = self:GetDamage(),
-            action = function(victim)
+            modifier = function(victim)
                 ZeusUtil.AbilityHit(hero, self, victim)
             end
         })

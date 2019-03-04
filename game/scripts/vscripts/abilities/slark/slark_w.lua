@@ -17,8 +17,20 @@ function slark_w:OnSpellStart()
             if not hero.falling then
                 hero:GetUnit():StartGestureWithPlaybackRate(ACT_DOTA_CAST_ABILITY_1, 1.5)
 
+                for _, modifier in pairs(hero:AllModifiers()) do
+                    if modifier:GetName() == "modifier_slark_a" then
+                        modifier:SetPurged(true)
+                    end
+                end
+
+                hero:GetUnit():Purge(false, true, false, true, false)
+
                 if hero:GetHealth() > self:GetDamage() then
-                    hero:Damage(hero, self:GetDamage())
+                    hero:EffectToTarget(hero, {
+                        ability = self,
+                        damage = self:GetDamage(),
+                        damageAmplifies = false
+                    })
                 end
 
                 hero:AreaEffect({
@@ -27,14 +39,6 @@ function slark_w:OnSpellStart()
                     damage = self:GetDamage(),
                     filterProjectiles = true
                 })
-
-                for _, modifier in pairs(hero:AllModifiers()) do
-                    if modifier:GetName() == "modifier_slark_a" then
-                        modifier:SetPurged(true)
-                    end
-                end
-
-                hero:GetUnit():Purge(false, true, false, true, false)
             end
 
             hero:EmitSound("Arena.Slark.CastW")

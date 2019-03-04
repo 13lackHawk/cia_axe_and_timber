@@ -19,16 +19,19 @@ function brew_w:OnSpellStart()
         continueOnHit = true,
         damagesTrees = true,
         goesThroughTrees = true,
-        hitFunction = function(projectile, target)
-            local stacks = hero:FindAbility("brew_q"):CountBeer(target)
+        hitParams = function(projectile, target)
+            return {
+                ability = self,
+                modifier = function(target)
+                    local stacks = hero:FindAbility("brew_q"):CountBeer(target)
+                    if stacks > 0 then
+                        target:AddNewModifier(hero, self, "modifier_stunned_lua", { duration = stacks * 0.5 })
+                    end
 
-            target:Damage(hero, heroStacks + 1)
-
-            if stacks > 0 then
-                target:AddNewModifier(hero, self, "modifier_stunned_lua", { duration = stacks * 0.5 })
-            end
-
-            hero:FindAbility("brew_q"):ClearBeer(target)
+                    hero:FindAbility("brew_q"):ClearBeer(target)
+                end,
+                damage = heroStacks + 1
+            }
         end
     }):Activate()
 

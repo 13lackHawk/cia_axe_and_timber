@@ -49,6 +49,9 @@ function void_e:OnSpellStart()
         end,
         hitParams = {
             ability = self,
+            modifier = function(target)
+                target:AddNewModifier(hero, self, "modifier_void_e_disarm", { duration = 2.0 })
+            end,
             action = function(target)
                 swapToSubAbilityIfNotAlreadySwapped()
 
@@ -58,8 +61,6 @@ function void_e:OnSpellStart()
                     TimedEntity(0, function()
                         hero:StopSound("Arena.Void.HitE")
                     end):Activate()
-
-                    target:AddNewModifier(hero, self, "modifier_void_e_disarm", { duration = 2.0 })
                 end
             end
         }

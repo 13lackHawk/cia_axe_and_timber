@@ -18,10 +18,14 @@ function cm_e:OnSpellStart()
         continueOnHit = true,
         damagesTrees = true,
         goesThroughTrees = true,
-        hitFunction = function(_, target)
-            CMUtil.AbilityHit(hero, target, self)
-
-            target:EmitSound("Arena.CM.HitE")
+        hitParams = function(_, target)
+            return {
+                damage = self:GetDamage(),
+                modifier = function(target)
+                    CMUtil.AbilityHit(hero, target, self)
+                end,
+                sound = "Arena.CM.HitE"
+            }
         end,
         destroyFunction = function(projectile)
             hero:StopSound("Arena.CM.LoopE")

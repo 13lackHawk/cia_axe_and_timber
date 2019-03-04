@@ -46,6 +46,13 @@ function Projectile:constructor(round, params)
     self.damagesTrees = params.damagesTrees
     self.damagesTreesx2 = params.damagesTreesx2
     self.goesThroughTrees = params.goesThroughTrees
+    self.hitParams = params.hitParams or {}
+
+    if type(self.hitParams) == "table" then
+        self.hitParams = function() 
+            return params.hitParams or {}
+        end
+    end
 
     if self.destroyOnDamage == nil then
        self.destroyOnDamage = true 
@@ -161,53 +168,45 @@ function Projectile:CollideWith(target)
         return
     end
 
-    local invulnerableTarget = target:IsInvulnerable()
+    if self.hitParams then
+        local params = self:hitParams(target)
 
-    local blocked = self.ability and target:AllowAbilityEffect(self, self.ability) == false
-
-    if instanceof(target, Obstacle) then
-        if self.damage or self.damagesTrees then
-            target:DealOneDamage(self)
-        else
-            target:Push(self.vel)
-        end
-    end
-
-    if not blocked then
-        if self.hitFunction then
-            self:hitFunction(target)
-        elseif self.damage ~= nil then
-            target:Damage(self, self.damage, self.isPhysical)
+        if self.hitModifier and not params.modifier then
+            params.modifier = self.hitModifier
         end
 
-        if self.knockback then
-            local direction = self.knockback.direction and self.knockback.direction(target) or self.vel
-            local force = self.knockback.force
-
-            if type(force) == "function" then
-                force = force(target)
+        if self.knockback and not params.knockback then
+            if not self.knockback.direction then
+                self.knockback.direction = (self.to - self.from):Normalized()
             end
-
-            SoftKnockback(target, self, direction, force or 20, {
-                decrease = self.knockback.decrease
-            })
+            params.knockback = self.knockback
         end
 
-        if self.hitModifier then
-            target:AddNewModifier(self:GetTrueHero(), self.hitModifier.ability, self.hitModifier.name, { duration = self.hitModifier.duration })
+        if self.hitSound and not params.sound then
+            params.sound = self.hitSound
         end
-    end
 
-    if self.nonBlockedHitAction then
-        self:nonBlockedHitAction(target, blocked)
-    end
+        if self.screenShake then
+            ScreenShake(self:GetPos(), unpack(self.screenShake))
+        end
 
-    if self.hitSound then
-        target:EmitSound(self.hitSound, target:GetPos())
-    end
+        if self.isPhysical and not params.isPhysical then
+            params.isPhysical = self.isPhysical
+        end
 
-    if self.screenShake then
-        ScreenShake(self:GetPos(), unpack(self.screenShake))
+        if self.damage and not params.damage then
+            params.damage = self.damage
+        end
+
+        if self.damagesTrees and not params.damagesTrees then
+            params.damagesTrees = self.damagesTrees
+        end
+
+        if self.ability and not params.ability then
+            params.ability = self.ability
+        end
+
+        self:EffectToTarget(target, params)
     end
 
     if self.continueOnHit then

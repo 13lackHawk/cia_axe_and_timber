@@ -16,7 +16,7 @@ function earth_spirit_w_sub:OnSpellStart()
         filter = Filters.Area(hero:GetPos(), 300),
         hitAllies = true,
         sound = "Arena.Earth.HitW.Sub",
-        action = function(target)
+        knockback = function(target)
             local direction = cursor - hero:GetPos()
             local force = instanceof(target, Hero) and 60 or 110
 

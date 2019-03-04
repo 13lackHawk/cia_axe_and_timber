@@ -12,12 +12,12 @@ function modifier_ta_q:GetEffectAttachType()
     return PATTACH_ABSORIGIN_FOLLOW
 end
 
-function modifier_ta_q:OnDamageReceived(_, _, amount, isPhysical)
+function modifier_ta_q:GetDamageChange(_, _, amount, isPhysical)
     if isPhysical then
-        return amount + 1
+        return 1
     end
 end
 
-function modifier_ta_q:OnDamageReceivedPriority()
+function modifier_ta_q:GetDamageChangePriority()
     return PRIORITY_AMPLIFY_DAMAGE
 end

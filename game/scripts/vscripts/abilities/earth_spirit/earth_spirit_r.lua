@@ -70,7 +70,7 @@ function EarthSpiritRoll:constructor(ability, hero, target)
 		hitParams = {
 			ability = ability,
 			damage = ability:GetDamage(),
-			action = function(target)
+			knockback = function(target)
 				EarthSpiritKnockback(ability, target, hero, self.direction:Normalized(), self.velocity / 50  * 90, { decrease = 5 })
 			end,
 			notBlockedAction = function(target)

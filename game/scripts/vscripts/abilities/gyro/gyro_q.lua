@@ -21,11 +21,15 @@ function self:OnSpellStart()
             graphics = "particles/gyro_q/gyro_q.vpcf",
             distance = 550,
             hitSound = "Arena.Gyro.HitQ",
-            nonBlockedHitAction = function(projectile, victim)
-                FX("particles/econ/items/gyrocopter/hero_gyrocopter_gyrotechnics/gyro_guided_missile_explosion.vpcf", PATTACH_ABSORIGIN, victim, {
-                    cp0 = projectile:GetPos(),
-                    release = true
-                })
+            hitParams = function(projectile,victim)
+                return {
+                    notBlockedAction = function(victim)
+                        FX("particles/econ/items/gyrocopter/hero_gyrocopter_gyrotechnics/gyro_guided_missile_explosion.vpcf", PATTACH_ABSORIGIN, victim, {
+                            cp0 = projectile:GetPos(),
+                            release = true
+                        })
+                    end
+                }
             end,
             screenShake = { 5, 150, 0.25, 1500, 0, true },
             damage = self:GetDamage(),

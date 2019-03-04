@@ -1,7 +1,7 @@
 ProjectileTimberE = ProjectileTimberE or class({}, nil, Projectile)
 
 function ProjectileTimberE:constructor(round, hero, target, ability)
-	getbase(ProjectileTimberE).constructor(self, round, {
+    getbase(ProjectileTimberE).constructor(self, round, {
         ability = ability,
         owner = hero,
         from = hero:GetPos() + Vector(0, 0, 64),
@@ -43,62 +43,67 @@ function ProjectileTimberE:CollideWith(target)
         return
     end
 
-    local blocked = target:AllowAbilityEffect(self, self.ability) == false
+    self:EffectToTarget(target, {
+        ability = self.ability,
+        damagesTrees = false,
+        damage = function(target)
+            if not ally then 
+                return 2
+            end
+        end,
+        modifier = function(target)
+            if not ally then
+                local distanceRoot = self.distancePassed
+                local theFurtherTheBetter = 0.1 * (distanceRoot / 48.3)
+                if theFurtherTheBetter < 0.5 then
+                    theFurtherTheBetter = 0.5
+                end
+                if instanceof(target, Hero) then
+                    target:AddNewModifier(self.hero, self.ability, "modifier_timber_e_root", { duration = theFurtherTheBetter })
+                    target:AddNewModifier(self.hero, self.ability, "modifier_stunned", { duration = 0.05 })
+                end
+            end
+        end,
+        action = function(target)
+            if not instanceof(target, Projectile)  then
+                self.hitSomething = true
+                target:EmitSound("Arena.Timber.HitE.Voice")
 
-    if blocked and not instanceof(target, Obstacle) then
-        self:RetractHook()
-        self.goingBack = true
-        return
-    end 
+                target.round.spells:InterruptDashes(target)
+                DashTimberE(target, self.hero, self.ability, self.particle)
 
-    if not ally and not instanceof(target, Obstacle) then
-        target:Damage(self, self.ability:GetDamage())
-        local distanceRoot = self.distancePassed
-        local theFurtherTheBetter = 0.1 * (distanceRoot / 48.3)
-        if theFurtherTheBetter < 0.5 then
-            theFurtherTheBetter = 0.5
+                target:EmitSound("Arena.Timber.HitE")
+
+                if instanceof(target, Hero) and not ally then
+                    local blood = ParticleManager:CreateParticle("particles/units/heroes/hero_pudge/pudge_meathook_impact.vpcf", PATTACH_ABSORIGIN_FOLLOW , target:GetUnit())
+                    ParticleManager:SetParticleControlEnt(blood, 0, target:GetUnit(), PATTACH_POINT_FOLLOW, "attach_hitloc", target:GetPos(), true)
+
+                    ParticleManager:DestroyParticle(blood, false)
+                    ParticleManager:ReleaseParticleIndex(blood)
+                end
+
+                self:Destroy()
+            end
+        end,
+        notBlockedAction = function(target, blocked)
+            if instanceof(target, Obstacle) and target.health > 1 then
+                self.hitSomething = true
+                target:DealOneDamage(self)
+                DashTimberE(target, self.hero, self.ability, self.particle)
+                self:Destroy()
+            elseif instanceof(target, Obstacle) and target.health == 1 then
+                self.hero:FindAbility("timber_e"):EndCooldown()
+                target:DealOneDamage(self)
+                self:RetractHook()
+                self.goingBack = true
+            end
+
+            if not instanceof(target, Obstacle) and blocked then
+                self:RetractHook()
+                self.goingBack = true
+            end
         end
-        if instanceof(target, Hero) then
-            target:AddNewModifier(self.hero, self.ability, "modifier_timber_e_root", { duration = theFurtherTheBetter })
-            target:AddNewModifier(self.hero, self.ability, "modifier_stunned", { duration = 0.05 })
-        end
-    end
-
-    if not instanceof(target, Projectile) then
-        if not instanceof(target, Obstacle) then
-            self.hitSomething = true
-        end
-
-        target:EmitSound("Arena.Timber.HitE.Voice")
-
-        target.round.spells:InterruptDashes(target)
-
-        if instanceof(target, Obstacle) and target.health > 1 then -- no fucking idea how to fix this shit
-            self.hitSomething = true
-            target:DealOneDamage(self)
-        elseif instanceof(target, Obstacle) and target.health == 1 then
-            print('ya ebal etot skill')
-            self.hero:FindAbility("timber_e"):EndCooldown()
-            target:DealOneDamage(self)
-            self:RetractHook()
-            self.goingBack = true
-            return
-        end
-
-        DashTimberE(target, self.hero, self.ability, self.particle, obstacle)
-
-        target:EmitSound("Arena.Timber.HitE")
-
-        if instanceof(target, Hero) and not ally then
-            local blood = ParticleManager:CreateParticle("particles/units/heroes/hero_pudge/pudge_meathook_impact.vpcf", PATTACH_ABSORIGIN_FOLLOW , target:GetUnit())
-            ParticleManager:SetParticleControlEnt(blood, 0, target:GetUnit(), PATTACH_POINT_FOLLOW, "attach_hitloc", target:GetPos(), true)
-
-            ParticleManager:DestroyParticle(blood, false)
-            ParticleManager:ReleaseParticleIndex(blood)
-        end
-
-        self:Destroy()
-    end
+    })
 end
 
 function ProjectileTimberE:CollidesWith(source)

@@ -15,12 +15,20 @@ function ember_w:OnSpellStart()
         speed = 1250,
         graphics = "particles/ember_w/ember_w.vpcf",
         distance = 1050,
-        hitModifier = { name = "modifier_ember_w", duration = 1.0, ability = ability },
         hitSound = "Arena.Ember.HitW",
-        hitFunction = function(projectile, target)
-            if EmberUtil.Burn(projectile:GetTrueHero(), target, ability) then
-                target:Damage(projectile, ability:GetDamage())
-            end
+        hitParams = function(projectile, target)
+            return {
+                damage = function(target)
+                    if EmberUtil.IsBurning(target) then
+                        target:Damage(projectile, ability:GetDamage())
+                    end
+                end,
+                modifier = function(target)
+                    EmberUtil.Burn(projectile:GetTrueHero(), target, ability)
+
+                    target:AddNewModifier(projectile:GetTrueHero(), ability, "modifier_ember_w", { duration = 1.0 })
+                end
+            }
         end,
         destroyFunction = function()
             hero:StopSound("Arena.Ember.CastW")

@@ -38,17 +38,21 @@ function drow_r:OnChannelFinish(interrupted)
         hitSound = "Arena.Drow.HitR",
         damage = self:GetDamage(),
         knockback = { force = 100 },
-        nonBlockedHitAction = function(projectile, target)
-            local pos = projectile:GetPos()
-            local effect = ImmediateEffectPoint("particles/econ/items/earthshaker/earthshaker_gravelmaw/earthshaker_fissure_dust_gravelmaw.vpcf", PATTACH_ABSORIGIN, target, pos)
-            ParticleManager:SetParticleControl(effect, 1, pos + direction * 300)
+        hitParams = function(projectile, target)
+            return {
+                notBlockedAction = function(target)
+                    local pos = projectile:GetPos()
+                    local effect = ImmediateEffectPoint("particles/econ/items/earthshaker/earthshaker_gravelmaw/earthshaker_fissure_dust_gravelmaw.vpcf", PATTACH_ABSORIGIN, target, pos)
+                    ParticleManager:SetParticleControl(effect, 1, pos + direction * 300)
 
-            effect = ImmediateEffectPoint("particles/drow_r/drow_r_bash.vpcf", PATTACH_ABSORIGIN, target, pos)
-            ParticleManager:SetParticleControlForward(effect, 1, -direction)
+                    effect = ImmediateEffectPoint("particles/drow_r/drow_r_bash.vpcf", PATTACH_ABSORIGIN, target, pos)
+                    ParticleManager:SetParticleControlForward(effect, 1, -direction)
 
-            if instanceof(target, Hero) then
-                projectile:Destroy()
-            end
+                    if instanceof(target, Hero) then
+                        projectile:Destroy()
+                    end
+                end
+            }
         end,
         destroyFunction = function(projectile)
             ScreenShake(projectile:GetPos(), 5, 150, 0.25, 3000, 0, true)

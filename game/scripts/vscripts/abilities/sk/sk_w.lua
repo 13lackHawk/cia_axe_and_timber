@@ -29,9 +29,13 @@ function SKWProjectile:constructor(round, hero, target, ability)
         considersGround = true,
         goesThroughTrees = true,
         ignoreProjectiles = true,
-        hitFunction = function(projectile, target)
-            target:Damage(projectile, ability:GetDamage())
-            SKUtil.AbilityHit(projectile:GetTrueHero(), target)
+        hitParams = function(projectile, target)
+            return {
+                damage = ability:GetDamage(),
+                modifier = function(target)
+                    SKUtil.AbilityHit(projectile:GetTrueHero(), target)
+                end
+            }
         end
     })
 

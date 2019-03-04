@@ -12,7 +12,20 @@ function ProjectileTimberQ:constructor(round, hero, target, damage, ability)
         disablePrediction = true,
         ability = ability,
         continueOnHit = true,
-        goesThroughTrees = true
+        goesThroughTrees = true,
+        hitParams = function(projectile, target)
+            return {
+                damage = damage,
+                sound = "Arena.PA.HitQ",
+                action = function(target)
+                    local direction = (target:GetPos() - projectile:GetPos()):Normalized()
+                    local blood = ImmediateEffect("particles/units/heroes/hero_riki/riki_backstab_hit_blood.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+                    ParticleManager:SetParticleControlEnt(blood, 0, target:GetUnit(), PATTACH_POINT_FOLLOW, "attach_hitloc", target:GetPos(), true)
+                    ParticleManager:SetParticleControlForward(blood, 0, direction)
+                    ParticleManager:SetParticleControl(blood, 2, direction * 1000)
+                end
+            }
+        end
     })
 
     self.initialVel = Vector(self.vel.x, self.vel.y)
@@ -34,18 +47,6 @@ function ProjectileTimberQ:constructor(round, hero, target, damage, ability)
 
     --self.vel = self.vel
     self.hitGroup[hero] = self.gracePeriod
-    self.hitFunction = function(self, target)
-        if target ~= self.hero then
-            target:Damage(self, damage)
-            target:EmitSound("Arena.PA.HitQ")
-
-            local direction = (target:GetPos() - self:GetPos()):Normalized()
-            local blood = ImmediateEffect("particles/units/heroes/hero_riki/riki_backstab_hit_blood.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-            ParticleManager:SetParticleControlEnt(blood, 0, target:GetUnit(), PATTACH_POINT_FOLLOW, "attach_hitloc", target:GetPos(), true)
-            ParticleManager:SetParticleControlForward(blood, 0, direction)
-            ParticleManager:SetParticleControl(blood, 2, direction * 1000)
-        end
-    end
 end
 
 function ProjectileTimberQ:Update()

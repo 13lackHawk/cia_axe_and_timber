@@ -37,10 +37,10 @@ function modifier_earth_spirit_r:AllowAbilityEffect(source)
     return false
 end
 
-function modifier_earth_spirit_r:OnDamageReceived()
+function modifier_earth_spirit_r:GetDamageChange()
     return false
 end
 
-function modifier_earth_spirit_r:OnDamageReceivedPriority()
+function modifier_earth_spirit_r:GetDamageChangePriority()
     return PRIORITY_ABSOLUTE_SHIELD
 end

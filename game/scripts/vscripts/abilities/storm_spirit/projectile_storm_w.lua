@@ -10,10 +10,14 @@ function ProjectileStormW:constructor(round, hero, target, ability)
         distance = 600,
         graphics = hero:GetMappedParticle("particles/units/heroes/hero_stormspirit/stormspirit_electric_vortex.vpcf"),
         disablePrediction = true,
-        hitFunction = function(projectile, victim)
-            projectile.hitSomething = true
-            victim.round.spells:InterruptDashes(victim)
-            DashStormW(hero, victim, ability, projectile.particle)
+        hitParams = function(projectile, victim)
+            return {
+                action = function(victim)
+                    projectile.hitSomething = true
+                    victim.round.spells:InterruptDashes(victim)
+                    DashStormW(hero, victim, ability, projectile.particle)
+                end
+            }
         end
     })
 end

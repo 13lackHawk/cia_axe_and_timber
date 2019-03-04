@@ -14,12 +14,13 @@ function earth_spirit_w:OnSpellStart()
     hero:AreaEffect({
         ability = self,
         filter = Filters.Area(target, 220),
-        action = function(victim)
+        modifier = function(victim)
             if instanceof(victim, Hero) then
                 victim:AddNewModifier(hero, self, "modifier_earth_spirit_a", { duration = 1.5 })
                 victim:AddNewModifier(hero, self, "modifier_earth_spirit_w_slow", { duration = 1.5 })
             end
-
+        end,
+        knockback = function(victim)
             if not instanceof(victim, Hero) then
                 local direction = (hero:GetPos() - victim:GetPos()) * Vector(1, 1, 0)
                 local force = direction:Length2D() / 10

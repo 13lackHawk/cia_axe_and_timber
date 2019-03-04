@@ -14,18 +14,17 @@ function EarthSpiritKnockback:constructor(ability, hero, source, direction, forc
 
 				return target.owner.team ~= source.owner.team
 			end,
-			action = function(target)
-				target:Damage(source, 2)
-			end
+			damage = 2
 		}
 	else
 		params.hitParams = {
 			ability = ability,
 			filter = function(target) return instanceof(target, EarthSpiritRemnant) end,
-			action = function(remnant)
-				if hero:AllowAbilityEffect(source, ability) then
-					hero:AddNewModifier(source, ability, "modifier_stunned_lua", { duration = 0.7 })
-				end
+			notBlockedAction = function(target)
+				target:EffectToTarget(hero, {
+					ability = ability,
+					modifier = { name = "modifier_stunned_lua", ability = ability, duration = 0.7 }
+				})
 			end
 		}
 	end

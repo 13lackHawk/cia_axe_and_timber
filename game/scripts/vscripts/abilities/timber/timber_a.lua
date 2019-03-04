@@ -22,13 +22,11 @@ function timber_a:OnSpellStart()
         filter = Filters.Cone(pos, range, forward, math.pi),
         sound = "Arena.Timber.HitA",
         damagesTreesx2 = true,
-        action = function(target)
-            if not instanceof(target, Obstacle) then
-                if instanceof(target, Rune) then
-                    target:Damage(hero, damage * 2, true)
-                else
-                    target:Damage(hero, damage, true)
-                end
+        damage = function(target)
+            if instanceof(target, Rune) then
+                return damage * 2
+            else
+                return damage
             end
         end,
         knockback = { force = 20, decrease = 3 },

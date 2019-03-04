@@ -13,22 +13,31 @@ function wr_w:OnSpellStart()
         graphics = "particles/wr_w/wr_w.vpcf",
         distance = 1000,
         hitSound = "Arena.WR.HitW",
-        hitFunction = function(projectile, target)
+        hitParams = function(projectile, target)
             if instanceof(target, Projectile) then
-                target:Deflect(hero, projectile.vel)
+                return {
+                    action = function(target)
+                        target:Deflect(hero, projectile.vel)
 
-                if instanceof(target, DistanceCappedProjectile) then
-                    target.distancePassed = 0
-                end
+                        if instanceof(target, DistanceCappedProjectile) then
+                            target.distancePassed = 0
+                        end
 
-                projectile:Destroy()
+                        projectile:Destroy()
+                    end
+                }
             else
-                target:AddNewModifier(hero, self, "modifier_stunned_lua", { duration = 1.0 })
-                SoftKnockback(target, hero, projectile.vel, 50, { decrease = 4 })
+                return {
+                    modifier = function(target)
+                        target:AddNewModifier(hero, self, "modifier_stunned_lua", { duration = 1.0 })
+                    end,
+                    knockback = function(target)
+                        SoftKnockback(target, hero, projectile.vel, 50, { decrease = 4 })
+                    end
+                }
             end
-
-            ScreenShake(projectile:GetPos(), 5, 150, 0.25, 3000, 0, true)
         end,
+        screenShake = {5, 150, 0.25, 3000, 0, true},
         hitProjectiles = true
     }):Activate()
 

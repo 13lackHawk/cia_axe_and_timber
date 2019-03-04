@@ -28,6 +28,14 @@ function modifier_pa_q:GetEffectAttachType()
     return PATTACH_ABSORIGIN_FOLLOW
 end
 
+function modifier_pa_q:GetDamageChange(source, hero)
+    local ent = self:GetCaster():GetParentEntity()
+
+    if source == ent or source.hero == ent then
+        return 1
+    end
+end
+
 function modifier_pa_q:OnDamageReceived(source, hero, amount, isPhysical)
     local ent = self:GetCaster():GetParentEntity()
 
@@ -38,10 +46,14 @@ function modifier_pa_q:OnDamageReceived(source, hero, amount, isPhysical)
             self:Destroy()
         end
 
-        return amount + 1
+        return true
     end
 end
 
 function modifier_pa_q:OnDamageReceivedPriority()
+    return PRIORITY_AMPLIFY_DAMAGE
+end
+
+function modifier_pa_q:GetDamageChangePriority()
     return PRIORITY_AMPLIFY_DAMAGE
 end

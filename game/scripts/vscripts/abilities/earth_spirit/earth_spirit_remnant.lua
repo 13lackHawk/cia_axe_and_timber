@@ -152,13 +152,14 @@ function EarthSpiritRemnant:Update()
             filter = Filters.Area(self:GetPos(), 400) + modifierFilter,
             ability = self.ability,
             sound = "Arena.Earth.ProcA",
-            action = function(target)
+            damage = function(target)
                 local mod = target:FindModifier("modifier_earth_spirit_a")
 
                 if mod then
-                    target:Damage(mod:GetCaster():GetParentEntity(), 1)
+                    return 1
                 end
-
+            end,
+            action = function(target)
                 target:RemoveModifier("modifier_earth_spirit_a")
             end,
             notBlockedAction = function(target)

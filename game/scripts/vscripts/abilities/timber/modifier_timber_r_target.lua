@@ -12,25 +12,29 @@ if IsServer() then
 
         local parent = self:GetParent():GetParentEntity()
         local caster = self:GetCaster():GetParentEntity()
-        local blocked = parent:AllowAbilityEffect(caster, self:GetAbility()) == false
-        local mod = parent:FindModifier("modifier_timber_r_slow")
+        
+        self:GetCaster():GetParentEntity():EffectToTarget(parent, {
+            ability = self:GetAbility(),
+            damage = 1,
+            modifier = function(target)
+                local mod = target:FindModifier("modifier_timber_r_slow")
 
-        if not blocked then
-            if not mod then
-                parent:AddNewModifier(caster, ability, "modifier_timber_r_slow", { duration = 1.5 })
-            else
-                mod:SetStackCount(math.min(mod:GetStackCount() + 1, 3))
-                mod:ForceRefresh()
+                if not mod then
+                    parent:AddNewModifier(caster, ability, "modifier_timber_r_slow", { duration = 1.5 })
+                else
+                    mod:SetStackCount(math.min(mod:GetStackCount() + 1, 3))
+                    mod:ForceRefresh()
+                end
+            end,
+            action = function(target)
+                FX("particles/timber_r/timber_r_hit.vpcf", PATTACH_CUSTOMORIGIN, self:GetCaster(), {
+                    cp0 = self:GetCaster():GetAbsOrigin() + Vector(0, 0, 100),
+                    cp1 = { ent = self:GetParent(), point = "attach_hitloc" },
+                    release = true
+                })
+                self:GetParent():EmitSound("Arena.Timber.HitR")
             end
-            parent:Damage(caster, 1)
-        end
-
-        FX("particles/timber_r/timber_r_hit.vpcf", PATTACH_CUSTOMORIGIN, self:GetCaster(), {
-            cp0 = self:GetCaster():GetAbsOrigin() + Vector(0, 0, 100),
-            cp1 = { ent = self:GetParent(), point = "attach_hitloc" },
-            release = true
         })
-        self:GetParent():EmitSound("Arena.Timber.HitR")
     end
 
     function self:CreateParticle()

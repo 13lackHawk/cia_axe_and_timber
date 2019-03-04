@@ -16,22 +16,25 @@ function wr_a:OnSpellStart()
         distance = 1200,
         hitSound = "Arena.Drow.HitA",
         damagesTrees = true,
-        hitFunction = function(projectile, target)
-            target:Damage(projectile, self:GetDamage(), true)
+        hitParams = function(projectile, target)
+            return {
+                damage = self:GetDamage(),
+                modifier = function(target)
+                    local hero = projectile:GetTrueHero()
 
-            local hero = projectile:GetTrueHero()
+                    if instanceof(target, Hero) then
+                        local haste = hero:FindModifier("modifier_wr_a")
 
-            if instanceof(target, Hero) then
-                local haste = hero:FindModifier("modifier_wr_a")
+                        if not haste then
+                            haste = hero:AddNewModifier(hero, self, "modifier_wr_a", {})
+                        end
 
-                if not haste then
-                    haste = hero:AddNewModifier(hero, self, "modifier_wr_a", {})
+                        if haste then
+                            haste:SetStackCount(haste:GetStackCount() + 60)
+                        end
+                    end
                 end
-
-                if haste then
-                    haste:SetStackCount(haste:GetStackCount() + 60)
-                end
-            end
+            }
         end,
         isPhysical = true
     }):Activate()

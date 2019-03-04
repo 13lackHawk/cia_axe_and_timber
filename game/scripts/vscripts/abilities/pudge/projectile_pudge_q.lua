@@ -44,45 +44,49 @@ function ProjectilePudgeQ:CollideWith(target)
         return
     end
 
-    local blocked = target:AllowAbilityEffect(self, self.ability) == false
-
-    if blocked then
-        if not self.goingBack then
-            if instanceof(target, Obstacle) then
-                target:DealOneDamage(self)
+    self:EffectToTarget(target, {
+        ability = self.ability,
+        damage = function(target)
+            if not ally then
+                return self.ability:GetDamage()
             end
-            
-            self:RetractHook()
+        end,
+        notBlockedAction = function(target, blocked)
+            if blocked then
+                if not self.goingBack then
+                    self:RetractHook()
+                end
+
+                self.goingBack = true
+                return
+            end
+        end,
+        action = function(target)
+            if not instanceof(target, Projectile) then
+                self.hitSomething = true
+
+                target:EmitSound("Arena.Pudge.HitQ")
+
+                if instanceof(target, Hero) and not ally then
+                    local blood = ParticleManager:CreateParticle("particles/units/heroes/hero_pudge/pudge_meathook_impact.vpcf", PATTACH_ABSORIGIN_FOLLOW , target:GetUnit())
+                    ParticleManager:SetParticleControlEnt(blood, 0, target:GetUnit(), PATTACH_POINT_FOLLOW, "attach_hitloc", target:GetPos(), true)
+
+                    ParticleManager:DestroyParticle(blood, false)
+                    ParticleManager:ReleaseParticleIndex(blood)
+
+                    target:EmitSound("Arena.Pudge.HitQ.Voice")
+                end
+
+                self:Destroy()
+            end
+        end,
+        knockback = function(target)
+            if not instanceof(target, Projectile) then
+                target.round.spells:InterruptDashes(target)
+                DashPudgeQ(self.hero, target, self.ability, self.particle)
+            end
         end
-
-        self.goingBack = true
-        return
-    end
-
-    if not ally then
-        target:Damage(self, self.ability:GetDamage())
-    end
-
-    if not instanceof(target, Projectile) then
-        self.hitSomething = true
-
-        target.round.spells:InterruptDashes(target)
-        DashPudgeQ(self.hero, target, self.ability, self.particle)
-
-        target:EmitSound("Arena.Pudge.HitQ")
-
-        if instanceof(target, Hero) and not ally then
-            local blood = ParticleManager:CreateParticle("particles/units/heroes/hero_pudge/pudge_meathook_impact.vpcf", PATTACH_ABSORIGIN_FOLLOW , target:GetUnit())
-            ParticleManager:SetParticleControlEnt(blood, 0, target:GetUnit(), PATTACH_POINT_FOLLOW, "attach_hitloc", target:GetPos(), true)
-
-            ParticleManager:DestroyParticle(blood, false)
-            ParticleManager:ReleaseParticleIndex(blood)
-
-            target:EmitSound("Arena.Pudge.HitQ.Voice")
-        end
-
-        self:Destroy()
-    end
+    })
 end
 
 function ProjectilePudgeQ:CollidesWith(source)

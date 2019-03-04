@@ -19,12 +19,15 @@ function ember_q:OnSpellStart()
         hitSound = "Arena.Ember.HitQ",
         continueOnHit = true,
         damagesTrees = true,
-        hitFunction = function(projectile, target)
-            target:Damage(projectile, ability:GetDamage())
-
-            if EmberUtil.Burn(projectile:GetTrueHero(), target, ability) then
-                target:AddNewModifier(projectile:GetTrueHero(), ability, "modifier_ember_q", { duration = 2.5 })
-            end
+        hitParams = function(projectile, target)
+            return {
+                damage = ability:GetDamage(),
+                modifier = function(target)
+                    if EmberUtil.Burn(projectile:GetTrueHero(), target, ability) then
+                        target:AddNewModifier(projectile:GetTrueHero(), ability, "modifier_ember_q", { duration = 2.5 })
+                    end
+                end
+            }
         end
     }):Activate()
 

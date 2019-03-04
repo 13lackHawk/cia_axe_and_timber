@@ -12,17 +12,19 @@ if IsServer() then
 
         local parent = self:GetParent():GetParentEntity()
         local caster = self:GetCaster():GetParentEntity()
-        local blocked = parent:AllowAbilityEffect(caster, self:GetAbility()) == false
 
-        if not blocked then
-            parent:Damage(caster, self:GetAbility():GetDamage())
-        end
-
-        FX("particles/undying_e/undying_e_hit.vpcf", PATTACH_CUSTOMORIGIN, self:GetCaster(), {
-            cp0 = self:GetCaster():GetAbsOrigin() + Vector(0, 0, 200),
-            cp1 = { ent = self:GetParent(), point = "attach_hitloc" },
-            release = true
+        caster:EffectToTarget(parent, {
+            ability = self:GetAbility(),
+            damage = self:GetAbility():GetDamage(),
+            notBlockedAction = function(target)
+                FX("particles/undying_e/undying_e_hit.vpcf", PATTACH_CUSTOMORIGIN, self:GetCaster(), {
+                    cp0 = self:GetCaster():GetAbsOrigin() + Vector(0, 0, 200),
+                    cp1 = { ent = target, point = "attach_hitloc" },
+                    release = true
+                })
+            end
         })
+
         self:GetParent():EmitSound("Arena.Undying.HitE")
     end
 

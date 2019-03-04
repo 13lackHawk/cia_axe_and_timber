@@ -128,7 +128,8 @@ function TinkerUtil.PortalAbility(ability, isPrimary, swapTo, startEffect, effec
             target,
             effect,
             warpEffect,
-            isPrimary
+            isPrimary,
+            self
         ):Activate()
 
         local second = TinkerUtil.FindPortal(self:GetCaster().hero, not isPrimary)
@@ -186,8 +187,6 @@ function CMUtil.Freeze(hero, target, ability)
 end
 
 function CMUtil.AbilityHit(hero, target, ability)
-    target:Damage(hero, ability:GetDamage())
-
     if CMUtil.IsFrozen(target) then
         CMUtil.Stun(hero, target, ability)
     end

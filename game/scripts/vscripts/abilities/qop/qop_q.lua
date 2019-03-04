@@ -17,8 +17,12 @@ function qop_q:OnSpellStart()
         distance = 950,
         damagesTrees = true,
         hitSound = "Arena.QOP.HitQ",
-        hitFunction = function(projectile, victim)
-            victim:AddNewModifier(projectile:GetTrueHero(), self, "modifier_qop_q", { duration = 3.0, heals = hadCharges })
+        hitParams = function(projectile, victim)
+            return {
+                modifier = function(victim)
+                    victim:AddNewModifier(projectile:GetTrueHero(), self, "modifier_qop_q", { duration = 3.0, heals = hadCharges })
+                end
+            }
         end
     }):Activate()
 
