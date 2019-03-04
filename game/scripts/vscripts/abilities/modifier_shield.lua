@@ -1,7 +1,6 @@
 modifier_shield = class({})
 
 local self = modifier_shield
-local index
 
 function self:GetTexture()
     return "rattletrap_power_cogs"
@@ -36,43 +35,44 @@ if IsServer() then
 
     function self:OnIntervalThink()
         local hero = self:GetParent():GetParentEntity()
+        local particle
+
         if self:GetStackCount() <= 2 then
-            if index ~= nil then
-                ParticleManager:DestroyParticle(index, false)
-                ParticleManager:ReleaseParticleIndex(index)
-            end
-            index = ParticleManager:CreateParticle("particles/timber_shield/shredder_armor_lyr1.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
-            ParticleManager:SetParticleControlEnt(index, 0, self:GetParent(), PATTACH_POINT_FOLLOW, "attach_armor", self:GetParent():GetOrigin(), true)
-            self:AddParticle(index, false, false, -1, false, false)
-        elseif self:GetStackCount() <= 3 and self:GetStackCount() > 2 then
-            if index ~= nil then
-                ParticleManager:DestroyParticle(index, false)
-                ParticleManager:ReleaseParticleIndex(index)
-            end
-            index = ParticleManager:CreateParticle("particles/timber_shield/shredder_armor_2.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
-            ParticleManager:SetParticleControlEnt(index, 0, self:GetParent(), PATTACH_POINT_FOLLOW, "attach_armor", self:GetParent():GetOrigin(), true)
-            self:AddParticle(index, false, false, -1, false, false)
-        elseif self:GetStackCount() <= 4 and self:GetStackCount() > 3 then
-            if index ~= nil then
-                ParticleManager:DestroyParticle(index, false)
-                ParticleManager:ReleaseParticleIndex(index)
-            end
-            index = ParticleManager:CreateParticle("particles/timber_shield/shredder_armor_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
-            ParticleManager:SetParticleControlEnt(index, 0, self:GetParent(), PATTACH_POINT_FOLLOW, "attach_armor", self:GetParent():GetOrigin(), true)
-            self:AddParticle(index, false, false, -1, false, false)
-        elseif self:GetStackCount() <= 8 and self:GetStackCount() > 4 then
-            if index ~= nil then
-                ParticleManager:DestroyParticle(index, false)
-                ParticleManager:ReleaseParticleIndex(index)
-            end
-            index = ParticleManager:CreateParticle("particles/timber_shield/shredder_armor_4.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
-            ParticleManager:SetParticleControlEnt(index, 0, self:GetParent(), PATTACH_POINT_FOLLOW, "attach_armor", self:GetParent():GetOrigin(), true)
-            self:AddParticle(index, false, false, -1, false, false)
+            particle = "particles/timber_shield/shredder_armor_lyr1.vpcf"
+        end
+
+        if self:GetStackCount() > 2 then
+            particle = "particles/timber_shield/shredder_armor_2.vpcf"
+        end
+
+        if self:GetStackCount() > 3 then
+            particle = "particles/timber_shield/shredder_armor_3.vpcf"
+        end
+
+        if self:GetStackCount() > 4 then
+            particle = "particles/timber_shield/shredder_armor_4.vpcf"
+        end
+
+        if self.index ~= nil and self.cached ~= particle then
+            ParticleManager:DestroyParticle(self.index, false)
+            ParticleManager:ReleaseParticleIndex(self.index)
+            self.index = nil
+            self.cached = nil
+        end
+
+        if particle and not self.cached then
+            self.index = FX(particle, PATTACH_ABSORIGIN_FOLLOW, hero, {
+                cp0 = { ent = hero:GetUnit(), point = "attach_armor" },
+                cp1 = { ent = hero:GetUnit(), point = "attach_chimmney" }
+            })
+            self.cached = particle
         end
     end
 
     function self:OnDestroy()
-        ParticleManager:DestroyParticle(index, false)
-        ParticleManager:ReleaseParticleIndex(index)
+        if self.index then
+            ParticleManager:DestroyParticle(self.index, false)
+            ParticleManager:ReleaseParticleIndex(self.index)
+        end
     end
 end
