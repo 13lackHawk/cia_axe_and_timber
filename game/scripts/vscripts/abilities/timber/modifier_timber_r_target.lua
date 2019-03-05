@@ -26,7 +26,7 @@ if IsServer() then
                     mod:ForceRefresh()
                 end
             end,
-            action = function(target)
+            notBlockedAction = function(target)
                 FX("particles/timber_r/timber_r_hit.vpcf", PATTACH_CUSTOMORIGIN, self:GetCaster(), {
                     cp0 = self:GetCaster():GetAbsOrigin() + Vector(0, 0, 100),
                     cp1 = { ent = self:GetParent(), point = "attach_hitloc" },
