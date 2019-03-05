@@ -337,7 +337,7 @@ function DynamicEntity:EffectToTarget(target, params)
     end
 
     local valid = true
-    if (resultAction.action or resultAction.damage or resultAction.knockback or resultAction.modifier) and params.ignoreAllowAbiltiyCheck ~= false then
+    if (resultAction.action or resultAction.damage or resultAction.knockback or resultAction.modifier) and params.ignoreAllowAbilityCheck ~= true then
         if params.ability then
             valid, resultAction = target:AllowAbilityEffect(self, params.ability, resultAction)
         end
