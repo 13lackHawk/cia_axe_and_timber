@@ -250,7 +250,7 @@ function DynamicEntity:EffectToTarget(target, params)
     local resultAction = {}
     local isTree = instanceof(target, Obstacle)
     local invulnerableTarget = target:IsInvulnerable()
-    local blocked = false
+    local soundPlayed = false
 
     local hero = self
 
