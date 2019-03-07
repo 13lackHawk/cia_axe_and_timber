@@ -362,7 +362,7 @@ function DynamicEntity:EffectToTarget(target, params)
         soundPlayed = true
     end
 
-    if not (invulnerableTarget or isTree) then
+    if not (invulnerableTarget or isTree) and resultAction then
         if resultAction.damage and params.dealDamage ~= false then
             target:Damage(hero, resultAction.damage.count, resultAction.damage.type, false)
         end

@@ -52,10 +52,6 @@ if IsServer() then
             end
         else
             self:GetParent():GetParentEntity():EmitSound("Arena.Axe.EndW")
-            --[[local mod = hero:FindModifier("modifier_axe_counter")
-            if mod:GetStackCount() < 3 and not hero:FindModifier("modifier_axe_rage") then
-                mod:IncrementStackCount()
-            end]]--
         end
     end
 end

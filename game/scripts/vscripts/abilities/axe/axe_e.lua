@@ -4,33 +4,25 @@ LinkLuaModifier("modifier_axe_e_animation", "abilities/axe/modifier_axe_e_animat
 LinkLuaModifier("modifier_axe_rage", "abilities/axe/modifier_axe_rage", LUA_MODIFIER_MOTION_NONE)
 
 function axe_e:OnSpellStart()
-    Wrappers.DirectionalAbility(self, 600)
+    Wrappers.DirectionalAbility(self, 600, 200)
 
+    local hit = false
     local hero = self:GetCaster().hero
     local dir = self:GetDirection()
     local target = self:GetCursorPosition() * Vector(1, 1, 0)
-    local BestJump = target
     local distance = (target - hero:GetPos()):Length2D()
-    local isMissed = true
+    hero:GetUnit():Interrupt()
+    hero:SetFacing(dir)
 
     hero:EmitSound("Arena.Axe.CastE")
 
-    if distance <= 200 then
-        BestJump = hero:GetPos() + dir * 200
-        target = BestJump
-    end
-
-    FunctionDash(hero, BestJump, 0.35, {
-        forceFacing = true,
+    FunctionDash(hero, target - 200 * dir, 0.35, {
         noFixedDuration = true,
-        --heightFunction = DashParabola(200),
         heightFunction = function(dash, current)
             local d = (dash.from - dash.to):Length2D()
             local x = (dash.from - current):Length2D()
-            local y0 = 0
-            local y1 = -150
 
-            return ParabolaZ2(y0, y1, 200, d, x)
+            return ParabolaZ(125, d, x)
         end,
         arrivalFunction = function()
             FX("particles/units/heroes/hero_centaur/centaur_warstomp.vpcf", PATTACH_ABSORIGIN, hero, {
@@ -48,12 +40,12 @@ function axe_e:OnSpellStart()
                 knockback = { force = 50, decrease = 5 },
                 action = function(victim)
                     if instanceof(victim, UnitEntity) then
-                        isMissed = false
+                        hit = true
                     end
                 end
             })
             local mod = hero:FindModifier("modifier_axe_counter")
-            if isMissed == false then
+            if hit then
                 if mod:GetStackCount() < 3 and not hero:FindModifier("modifier_axe_rage") then
                     mod:IncrementStackCount()
                 end
