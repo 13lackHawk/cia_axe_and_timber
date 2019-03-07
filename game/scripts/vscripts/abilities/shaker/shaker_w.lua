@@ -15,7 +15,7 @@ function shaker_w:OnSpellStart()
         filter = Filters.Area(pos, 400),
         damage = self:GetDamage(),
         filterProjectiles = true,
-        action = function(target)
+        knockback = function(target)
             local dir = pos - target:GetPos()
 
             Knockback(target, self, dir, math.max(20, dir:Length2D() - 96), 1300,

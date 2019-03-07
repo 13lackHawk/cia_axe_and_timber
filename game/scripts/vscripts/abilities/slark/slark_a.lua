@@ -25,6 +25,11 @@ function slark_a:OnSpellStart()
         damage = damage,
         knockback = { force = force, decrease = 3 },
         isPhysical = true,
+        modifier = function(target)
+            if target:Alive() and instanceof(target, Hero) and hero:GetHealth() < hero:GetUnit():GetMaxHealth() then
+                hero:AddNewModifier(hero, self, "modifier_slark_a", { duration = 6 }):SetTarget(target)
+            end
+        end,
         action = function(target)
             if instanceof(target, Hero) and hero:GetHealth() < hero:GetUnit():GetMaxHealth() then
                 FX("particles/units/heroes/hero_slark/slark_essence_shift.vpcf", PATTACH_ABSORIGIN_FOLLOW, target, {
@@ -34,10 +39,6 @@ function slark_a:OnSpellStart()
                 })
 
                 hero:Heal(1)
-
-                if target:Alive() then
-                    hero:AddNewModifier(hero, self, "modifier_slark_a", { duration = 6 }):SetTarget(target)
-                end
             end
         end
     })

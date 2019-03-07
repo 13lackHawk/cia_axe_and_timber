@@ -21,7 +21,8 @@ function cm_q:OnSpellStart()
             ability = self,
             damagesTrees = true,
             filter = Filters.Area(target, 200),
-            action = function(victim)
+            damage = self:GetDamage(),
+            modifier = function(victim)
                 CMUtil.AbilityHit(hero, victim, self)
             end
         })

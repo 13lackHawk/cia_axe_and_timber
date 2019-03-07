@@ -13,55 +13,59 @@ function venge_e:OnSpellStart()
         graphics = "particles/venge_e/venge_e.vpcf",
         distance = 950,
         hitSound = "Arena.Venge.HitE",
-        hitFunction = function(projectile, target)
-            local pos = hero:GetPos()
+        hitParams = function(projectile, target)
+            return {
+                action = function(target)
+                    local pos = hero:GetPos()
 
-            local effect = ImmediateEffect("particles/units/heroes/hero_vengeful/vengeful_nether_swap.vpcf", PATTACH_ABSORIGIN, hero)
-            ParticleManager:SetParticleControl(effect, 0, hero:GetPos())
-            ParticleManager:SetParticleControl(effect, 1, target:GetPos())
+                    local effect = ImmediateEffect("particles/units/heroes/hero_vengeful/vengeful_nether_swap.vpcf", PATTACH_ABSORIGIN, hero)
+                    ParticleManager:SetParticleControl(effect, 0, hero:GetPos())
+                    ParticleManager:SetParticleControl(effect, 1, target:GetPos())
 
-            effect = ImmediateEffect("particles/units/heroes/hero_vengeful/vengeful_nether_swap_target.vpcf", PATTACH_ABSORIGIN, hero)
-            ParticleManager:SetParticleControl(effect, 1, hero:GetPos())
-            ParticleManager:SetParticleControl(effect, 0, target:GetPos())
+                    effect = ImmediateEffect("particles/units/heroes/hero_vengeful/vengeful_nether_swap_target.vpcf", PATTACH_ABSORIGIN, hero)
+                    ParticleManager:SetParticleControl(effect, 1, hero:GetPos())
+                    ParticleManager:SetParticleControl(effect, 0, target:GetPos())
 
-            local z = pos.z
-            local heroPos = target:GetPos()
-            pos.z = heroPos.z
-            heroPos.z = z
+                    local z = pos.z
+                    local heroPos = target:GetPos()
+                    pos.z = heroPos.z
+                    heroPos.z = z
 
-            hero:FindClearSpace(heroPos, true)
-            target:FindClearSpace(pos, true)
+                    hero:FindClearSpace(heroPos, true)
+                    target:FindClearSpace(pos, true)
 
-            target:EmitSound("Arena.Venge.HitE")
+                    target:EmitSound("Arena.Venge.HitE")
 
-            hero.round.spells:InterruptDashes(hero)
-            target.round.spells:InterruptDashes(target)
+                    hero.round.spells:InterruptDashes(hero)
+                    target.round.spells:InterruptDashes(target)
 
-            local tempFalling = hero.falling
-            local tempFallingSpeed = hero.fallingSpeed
+                    local tempFalling = hero.falling
+                    local tempFallingSpeed = hero.fallingSpeed
 
-            hero.falling = target.falling
-            hero.fallingSpeed = target.fallingSpeed
+                    hero.falling = target.falling
+                    hero.fallingSpeed = target.fallingSpeed
 
-            target.falling = tempFalling
-            target.fallingSpeed = tempFallingSpeed
+                    target.falling = tempFalling
+                    target.fallingSpeed = tempFallingSpeed
 
-            if not hero.falling then
-                hero:RemoveModifier("modifier_falling")
-            else
-                hero:MakeFall()
-            end
+                    if not hero.falling then
+                        hero:RemoveModifier("modifier_falling")
+                    else
+                        hero:MakeFall()
+                    end
 
-            if not target.falling then
-                target:RemoveModifier("modifier_falling")
-            else
-                target:MakeFall()
-            end
+                    if not target.falling then
+                        target:RemoveModifier("modifier_falling")
+                    else
+                        target:MakeFall()
+                    end
 
-            -- Otherwise it gets destroyed anyway
-            if instanceof(target, Projectile) then
-                projectile:Destroy()
-            end
+                    -- Otherwise it gets destroyed anyway
+                    if instanceof(target, Projectile) then
+                        projectile:Destroy()
+                    end
+                end
+            }
         end,
         hitCondition = function(projectile, target)
             return target ~= hero

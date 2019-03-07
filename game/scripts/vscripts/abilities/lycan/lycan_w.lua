@@ -15,10 +15,10 @@ function lycan_w:OnSpellStart()
 
     hero:EmitSound("Arena.Lycan.CastW", target)
 
-    local modifier = nil
+    local modifier = false
 
     if LycanUtil.IsTransformed(hero) then
-        modifier = { name = "modifier_lycan_w", duration = 2.5, ability = self }
+        modifier = true
     end
 
     TimedEntity(2.0, function()
@@ -35,9 +35,12 @@ function lycan_w:OnSpellStart()
             ability = self,
             filter = Filters.Area(target, 500),
             damage = self:GetDamage(),
-            modifier = modifier,
-            action = function(target)
+            modifier = function(target)
                 LycanUtil.MakeBleed(hero, target)
+
+                if modifier then
+                    target:AddNewModifier(hero, self, "modifier_lycan_w", { duration = 2.5 })
+                end
             end
         })
     end):Activate()

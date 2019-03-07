@@ -49,9 +49,11 @@ function cm_w:OnChannelThink(interval)
                 local hit = hero:AreaEffect({
                     ability = self,
                     filter = Filters.And(Filters.Area(target, 128), groupFilter),
-                    action = function(victim)
+                    damage = self:GetDamage(),
+                    modifier = function(victim)
                         CMUtil.AbilityHit(hero, victim, self)
-                        
+                    end,
+                    action = function(victim)
                         self.damaged[victim] = true
                     end,
                     damagesTrees = true,

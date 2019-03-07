@@ -28,6 +28,8 @@ function DrowQInstance:Update(interval)
         self.projectileCounter = (self.projectileCounter or 0) + 1
         self.damaged = self.damaged or {}
 
+        local shouldGetDamage 
+
         DistanceCappedProjectile(hero.round, {
             ability = ability,
             owner = hero,
@@ -38,25 +40,31 @@ function DrowQInstance:Update(interval)
             graphics = "particles/drow_a/drow_a.vpcf",
             damage = ability:GetDamage(),
             hitSound = "Arena.Drow.HitA",
-            hitFunction = function(projectile, victim)
-                local modifier = victim:FindModifier("modifier_drow_q")
+            hitParams = function(projectile, victim)
+                return {
+                    modifier = function(target)
+                        local modifier = victim:FindModifier("modifier_drow_q")
 
-                if not modifier then
-                    modifier = victim:AddNewModifier(projectile:GetTrueHero(), ability, "modifier_drow_q", { duration = 2 })
+                        if not modifier then
+                            modifier = victim:AddNewModifier(projectile:GetTrueHero(), ability, "modifier_drow_q", { duration = 2 })
 
-                    if modifier then
-                        modifier:SetStackCount(1)
+                            if modifier then
+                                modifier:SetStackCount(1)
+                            end
+                        else
+                            modifier:IncrementStackCount()
+                            modifier:ForceRefresh()
+                        end
+                    end,
+                    damage = function(target)
+                        if not self.damaged[target] or self.damaged[target] < 3 then
+                            return ability:GetDamage()
+                        end
+                    end,
+                    action = function(target)
+                        self.damaged[target] = (self.damaged[target] or 0) + 1
                     end
-                else
-                    modifier:IncrementStackCount()
-                    modifier:ForceRefresh()
-                end
-
-                self.damaged[victim] = (self.damaged[victim] or 0) + 1
-
-                if self.damaged[victim] <= 3 then
-                    victim:Damage(projectile, ability:GetDamage())
-                end
+                }
             end,
             knockback = { force = 20, decrease = 5.5 },
             destroyFunction = function()

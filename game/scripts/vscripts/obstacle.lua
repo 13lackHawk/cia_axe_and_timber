@@ -101,7 +101,7 @@ function Obstacle:RegenerateNavBlock()
 end
 
 function Obstacle:AllowAbilityEffect(source, ability)
-    return false
+    return false, {}
 end
 
 function Obstacle:CollideWith(target)
@@ -207,8 +207,12 @@ function TreeHealProjectile:constructor(round, hero, target, pos, graphic)
         target = target,
         speed = 900,
         graphics = graphics,
-        hitFunction = function(projectile, target)
-            projectile:AddOrRefreshTreeHealModifier(target)
+        hitParams = function(projectile, target)
+            return {
+                modifier = function(target)
+                    projectile:AddOrRefreshTreeHealModifier(target)
+                end
+            }
         end
     })
 end

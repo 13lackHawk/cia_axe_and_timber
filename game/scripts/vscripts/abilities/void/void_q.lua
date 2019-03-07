@@ -19,9 +19,7 @@ function void_q:OnSpellStart()
         distance = 1200,
         hitSound = "Arena.Void.HitQ",
         hitModifier = { name = "modifier_void_q", duration = 1.5, ability = self },
-        hitFunction = function(projectile, target)
-            target:Damage(projectile, self:GetDamage())
-        end,
+        damage = self:GetDamage(),
         destroyOnDamage = false,
         damagesTrees = true,
         disablePrediction = true

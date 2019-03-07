@@ -29,7 +29,8 @@ function zeus_e:OnSpellStart()
             action = function(target)
                 local pos = target:GetPos()
                 self:CreateLightning(self, pos + Vector(0, 0, 800), pos)
-
+            end,
+            modifier = function(target)
                 ZeusUtil.AbilityHit(hero, self, target)
             end
         })

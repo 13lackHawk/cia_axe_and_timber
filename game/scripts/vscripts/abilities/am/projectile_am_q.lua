@@ -30,18 +30,23 @@ function ProjectileAMQ:constructor(round, hero, target, ability, particle, slot,
     self:EmitSound("Arena.AM.LoopQ")
 
     self.hitGroup[hero] = self.gracePeriod
-    self.hitFunction = function(self, target)
-        target:EmitSound("Arena.AM.Hit")
-        target:Damage(self, self.ability:GetDamage(), self.isPhysical)
+    self.hitParams = function(projectile, target)
+        return {
+            ability = ability,
+            damage = projectile.ability:GetDamage(),
+            isPhysical = projectile.isPhysical,
+            sound = "Arena.AM.Hit",
+            action = function(target)
+                local direction = (target:GetPos() - projectile:GetPos()):Normalized()
 
-        local direction = (target:GetPos() - self:GetPos()):Normalized()
-
-        FX("particles/units/heroes/hero_riki/riki_backstab_hit_blood.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, {
-            cp0 = { ent = target, point = "attach_hitloc" },
-            cp0f = direction,
-            cp2 = direction * 1000,
-            release = true
-        })
+                FX("particles/units/heroes/hero_riki/riki_backstab_hit_blood.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, {
+                    cp0 = { ent = target, point = "attach_hitloc" },
+                    cp0f = direction,
+                    cp2 = direction * 1000,
+                    release = true
+                })
+            end
+        }
     end
 end
 

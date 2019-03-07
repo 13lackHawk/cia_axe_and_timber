@@ -9,8 +9,9 @@ function lycan_e:OnSpellStart()
         ability = self,
         filter = Filters.Area(hero:GetPos(), 350),
         onlyHeroes = true,
-        modifier = { name = "modifier_lycan_e", ability = self, duration = 2.0 },
-        action = function(target)
+        modifier = function(target)
+            target:AddNewModifier(hero, self, "modifier_lycan_e", { duration = 2 })
+
             if instanceof(target, Hero) then
                 target:AddKnockbackSource(hero, 2.0)
             end

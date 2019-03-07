@@ -98,15 +98,21 @@ function axe_r:OnChannelFinish(interrupted)
                 end
             end
         end,
-        hitFunction = function(projectile, target)
-            if not instanceof(target, Obstacle) then
-                hitSomething = true
-            end
-
-            if instanceof(target, Hero) then
-                target:AddNewModifier(hero, self, "modifier_axe_r", { duration = 3.0 })
-            end
-            target:Damage(projectile, self:GetDamage())
+        hitParams = function(projectile, target)
+            return {
+                ability = self,
+                action = function(target) 
+                    if not instanceof(target, Obstacle) then
+                        hitSomething = true
+                    end
+                end,
+                modifier = function(target)
+                    if instanceof(target, Hero) then
+                        target:AddNewModifier(hero, self, "modifier_axe_r", { duration = 3.0 })
+                    end
+                end,
+                damage = self:GetDamage()
+            }
         end
     }):Activate()
 

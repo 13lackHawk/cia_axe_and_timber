@@ -1,6 +1,6 @@
 EntityTinkerE = EntityTinkerE or class({}, nil, DynamicEntity)
 
-function EntityTinkerE:constructor(round, owner, position, effect, warpEffect, primary)
+function EntityTinkerE:constructor(round, owner, position, effect, warpEffect, primary, ability)
     getbase(EntityTinkerE).constructor(self, round, nil, position, owner:GetUnit():GetTeamNumber())
 
     self.hero = owner
@@ -20,6 +20,7 @@ function EntityTinkerE:constructor(round, owner, position, effect, warpEffect, p
 
     self.arrived = {}
     self.primary = primary
+    self.ability = ability
 end
 
 function EntityTinkerE:CollidesWith(target)
@@ -50,34 +51,36 @@ end
 
 function EntityTinkerE:CollideWith(target)
     if self.link and self.link:Alive() and not self.arrived[target] then
-        if target:AllowAbilityEffect(self, self.ability) == false then
-            return
-        end
+        self:EffectToTarget(target, {
+            action = function(target)
+                local old = target:GetPos()
+                local diff = old - self:GetPos()
 
-        local old = target:GetPos()
-        local diff = old - self:GetPos()
+                self.hero:EmitSound("Arena.Tinker.HitE", old)
+                self.hero:EmitSound("Arena.Tinker.HitE2", self.link:GetPos())
 
-        self.hero:EmitSound("Arena.Tinker.HitE", old)
-        self.hero:EmitSound("Arena.Tinker.HitE2", self.link:GetPos())
+                target:FindClearSpace((self.link:GetPos() + diff) * Vector(1, 1, 0) + Vector(0, 0, old.z), true)
+                self.link:AddArrived(target)
 
-        target:FindClearSpace((self.link:GetPos() + diff) * Vector(1, 1, 0) + Vector(0, 0, old.z), true)
-        self.link:AddArrived(target)
+                local selfPos = self:GetPos()
+                local index = ParticleManager:CreateParticle("particles/econ/items/zeus/arcana_chariot/zeus_arcana_blink_start.vpcf", PATTACH_ABSORIGIN, target.unit)
+                ParticleManager:SetParticleControl(index, 0, selfPos)
+                ParticleManager:SetParticleControl(index, 1, selfPos)
+                ParticleManager:SetParticleControl(index, 2, selfPos)
+                ParticleManager:ReleaseParticleIndex(index)
 
-        local selfPos = self:GetPos()
-        local index = ParticleManager:CreateParticle("particles/econ/items/zeus/arcana_chariot/zeus_arcana_blink_start.vpcf", PATTACH_ABSORIGIN, target.unit)
-        ParticleManager:SetParticleControl(index, 0, selfPos)
-        ParticleManager:SetParticleControl(index, 1, selfPos)
-        ParticleManager:SetParticleControl(index, 2, selfPos)
-        ParticleManager:ReleaseParticleIndex(index)
+                local linkPos = self.link:GetPos()
+                index = ParticleManager:CreateParticle("particles/econ/items/zeus/arcana_chariot/zeus_arcana_blink_end.vpcf", PATTACH_ABSORIGIN, target.unit)
+                ParticleManager:SetParticleControl(index, 0, linkPos)
+                ParticleManager:SetParticleControl(index, 1, linkPos)
+                ParticleManager:SetParticleControl(index, 2, linkPos)
+                ParticleManager:ReleaseParticleIndex(index)
 
-        local linkPos = self.link:GetPos()
-        index = ParticleManager:CreateParticle("particles/econ/items/zeus/arcana_chariot/zeus_arcana_blink_end.vpcf", PATTACH_ABSORIGIN, target.unit)
-        ParticleManager:SetParticleControl(index, 0, linkPos)
-        ParticleManager:SetParticleControl(index, 1, linkPos)
-        ParticleManager:SetParticleControl(index, 2, linkPos)
-        ParticleManager:ReleaseParticleIndex(index)
-
-        target.round.spells:InterruptDashes(target)
+                target.round.spells:InterruptDashes(target)
+            end,
+            ability = self.ability
+        })
+        
     end
 end
 

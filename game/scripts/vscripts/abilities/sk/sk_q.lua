@@ -28,8 +28,8 @@ function sk_q:OnSpellStart()
             filter = Filters.Area(target, area),
             filterProjectiles = true,
             damage = self:GetDamage(),
-            modifier = { name = "modifier_sk_q", ability = self, duration = 1.2 },
-            action = function(target)
+            modifier = function(target)
+                target:AddNewModifier(hero, self, "modifier_sk_q", { duration = 1.2 })
                 SKUtil.AbilityHit(hero, target)
             end
         })

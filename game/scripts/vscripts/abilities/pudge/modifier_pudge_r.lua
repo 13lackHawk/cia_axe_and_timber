@@ -16,15 +16,15 @@ function modifier_pudge_r:GetEffectName()
     return "particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf"
 end
 
-function modifier_pudge_r:OnDamageReceived(source, _, amount, _)
+function modifier_pudge_r:GetDamageChange(source, _, amount, _)
     local hero = self:GetCaster():GetParentEntity()
     local proj = instanceof(source, Projectile)
 
     if (hero == source or (proj and source.hero == hero)) then
-        return amount + 1
+        return 1
     end
 end
 
-function modifier_pudge_r:OnDamageReceivedPriority()
+function modifier_pudge_r:GetDamageChangePriority()
     return PRIORITY_AMPLIFY_DAMAGE
 end

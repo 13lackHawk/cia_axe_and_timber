@@ -23,14 +23,14 @@ function axe_a:OnSpellStart()
         filter = Filters.Area(hero:GetPos(), 300),
         sound = "Arena.Axe.HitA",
         damagesTrees = true,
-        action = function(target)
+        damage = function(target)
             local dmg = damage
 
             if fukkenRage then
                 dmg = dmg * 2
             end
 
-            target:Damage(hero, dmg, true)
+            return dmg
         end,
         knockback = { force = 20, decrease = 3 },
         isPhysical = true

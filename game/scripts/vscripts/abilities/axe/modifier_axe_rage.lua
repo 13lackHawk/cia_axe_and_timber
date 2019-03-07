@@ -20,13 +20,12 @@ function modifier_axe_rage:GetStatusEffectName()
     return "particles/status_fx/status_effect_overpower.vpcf"
 end
 
-function modifier_axe_rage:OnDamageReceived(source, _, amount)
+function modifier_axe_rage:GetDamageChange(source, _, amount)
     if amount > 1 then
-        amount = amount - 1
+        return -1
     end
-    return amount
 end
 
-function modifier_axe_rage:OnDamageReceivedPriority()
-    return PRIORITY_POST_SHIELD_ACTION
+function modifier_axe_rage:GetDamageChangePriority()
+    return PRIORITY_AMPLIFY_DAMAGE
 end

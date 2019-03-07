@@ -119,8 +119,8 @@ function DynamicEntity:TestFalling()
 end
 
 
-function DynamicEntity:Damage(source, amount, isPhysical)
-    Spells.SystemCallSingle(self, "Damage", source, amount, isPhysical)
+function DynamicEntity:Damage(source, amount, isPhysical, amplifies)
+    Spells.SystemCallSingle(self, "Damage", source, self:CalculateDamage(source, amount, isPhysical, amplifies), isPhysical)
 end
 
 function DynamicEntity:Heal() end
@@ -142,18 +142,90 @@ function DynamicEntity:AllModifiers()
     return {}
 end
 
-function DynamicEntity:AllowAbilityEffect(source, ability)
+function DynamicEntity:AllowAbilityEffect(source, ability, data)
     if not self:Alive() then
         return true
     end
 
+    local valid = true
+    if not data then data = {} end
+    local Effect = vlua.clone(data)
+
     for _, modifier in pairs(self:AllModifiers()) do
-        if modifier.AllowAbilityEffect and modifier:AllowAbilityEffect(source, ability) == false then
+        if modifier.AllowAbilityEffect then
+            local val = modifier:AllowAbilityEffect(source, ability, Effect)
+
+            if val == false then
+                Effect = {}
+                valid = false
+            elseif type(val) == "table" and not valid == false then
+                Effect = val
+            end
+        end
+    end
+
+    return valid, Effect
+end
+
+function DynamicEntity:CalculateDamage(source, damage, physical, amplifies)
+    if amplifies == false then
+        return damage
+    end
+
+    local modifiers = {
+        damageChange = {},
+        damageDealtChange = {}
+    }
+
+    for _,  modifier in pairs(self:AllModifiers()) do
+        if modifier.GetDamageChange then
+            table.insert(modifiers.damageChange, modifier)
+        end
+    end
+
+    for _,  modifier in pairs(source:AllModifiers()) do
+        if modifier.GetDamageDealtChange then
+            table.insert(modifiers.damageDealtChange, modifier)
+        end
+    end
+
+    table.sort(modifiers.damageChange, function(a, b)
+        local ap = a.GetDamageChangePriority and a:GetDamageChangePriority() or 0
+        local bp = b.GetDamageChangePriority and b:GetDamageChangePriority() or 0
+
+        return ap > bp
+    end)
+
+    table.sort(modifiers.damageDealtChange, function(a, b)
+        local ap = a.GetDamageDealtChangePriority and a:GetDamageDealtChangePriority() or 0
+        local bp = b.GetDamageDealtChangePriority and b:GetDamageDealtChangePriority() or 0
+
+        return ap > bp
+    end)
+
+    for _, modifier in pairs(modifiers.damageChange) do
+        local change = modifier:GetDamageChange(source, self, damage, physical)
+
+        if type(change) == "number" then
+            damage = damage + change
+        elseif change == false then
             return false
         end
     end
 
-    return true
+    for _, modifier in pairs(modifiers.damageDealtChange) do
+        if modifier.GetDamageDealtChange then
+            local change = modifier:GetDamageDealtChange(source, self, damage, physical)
+
+            if type(change) == "number" then
+                damage = damage + change
+            elseif change == false then
+                return false
+            end
+        end
+    end
+
+    return damage
 end
 
 function DynamicEntity:OnBlockedAbilityDamage(source, ability, damage, isPhysical)
@@ -172,6 +244,144 @@ function DynamicEntity:Activate()
     self.round.spells:AddDynamicEntity(self)
 
     return self
+end
+
+function DynamicEntity:EffectToTarget(target, params)
+    local resultAction = {}
+    local isTree = instanceof(target, Obstacle)
+    local invulnerableTarget = target:IsInvulnerable()
+    local soundPlayed = false
+
+    local hero = self
+
+    if self.hero then
+        hero = self.hero
+    end
+
+    if self.heroOverride then
+        hero = self.heroOverride
+    end
+
+    if isTree and ((params.damage ~= nil and params.damagesTrees ~= false) or params.damagesTrees) and not params.damagesTreesx2 then
+        target:DealOneDamage(self)
+    elseif isTree and params.damagesTreesx2 then
+        target:DealOneDamage(self)
+        target:DealOneDamage(self)
+    end
+
+    if params.modifier then
+        if type(params.modifier) == "table" then
+            resultAction.modifier = function(target)
+                local m = params.modifier
+
+                target:AddNewModifier(hero, m.ability, m.name, { duration = m.duration })
+            end
+        elseif type(params.modifier) == "function" then
+            resultAction.modifier = params.modifier
+        end
+    end
+
+    if params.damage then
+        local damage = params.damage
+        if type(params.damage) == "function" then
+            damage = params.damage(target)
+        end
+
+        local resultDmg = target:CalculateDamage(hero, damage, params.isPhysical, params.damageAmplifies)
+
+        if type(resultDmg) == "number" and resultDmg > 0 then
+            resultAction.damage = {}
+            resultAction.damage.count = resultDmg
+            resultAction.damage.real = damage
+            resultAction.damage.type = params.isPhysical
+        end
+    end
+
+    if params.knockback then
+        if type(params.knockback) == "table" then
+            resultAction.knockback = function(target)
+                local direction 
+                if params.knockback.direction then
+                    if type(params.knockback.direction) == "function" then
+                        direction = params.knockback.direction(target)
+                    else
+                        direction = params.knockback.direction
+                    end
+                else direction = (target:GetPos() - self:GetPos()) end
+
+                local force = params.knockback.force
+                local decrease = params.knockback.decrease
+
+                if type(force) == "function" then
+                    force = force(target)
+                end
+
+                if type(decrease) == "function" then
+                    decrease = decrease(target)
+                end
+
+                SoftKnockback(target, self, direction, force or 20, {
+                    decrease = decrease,
+                    knockup = params.knockback.knockup
+                })
+            end
+        elseif type(params.knockback) == "function" then
+            resultAction.knockback = params.knockback
+        end
+    end
+
+    if params.action then
+        resultAction.action = function(target, data)
+            params.action(target, data)
+        end
+    end
+
+    local valid = true
+    if (resultAction.action or resultAction.damage or resultAction.knockback or resultAction.modifier) and params.ignoreAllowAbilityCheck ~= true then
+        if params.ability then
+            valid, resultAction = target:AllowAbilityEffect(self, params.ability, resultAction)
+        end
+    end
+
+    if params.notBlockedAction then
+        resultAction.notBlockedAction = function(target, blocked, data)
+            params.notBlockedAction(target, blocked, data)
+        end
+    end
+
+    if params.sound and not soundPlayed then
+        if type(params.sound) == "table" then
+            for _, sound in pairs(params.sound) do
+                self:EmitSound(sound, target:GetPos())
+            end
+        else
+            self:EmitSound(params.sound, target:GetPos())
+        end
+
+        soundPlayed = true
+    end
+
+    if not (invulnerableTarget or isTree) then
+        if resultAction.damage and params.dealDamage ~= false then
+            target:Damage(hero, resultAction.damage.count, resultAction.damage.type, false)
+        end
+
+        if resultAction.modifier and params.createModifier ~= false then
+            resultAction.modifier(target)
+        end
+
+        if resultAction.knockback and params.doKnockback ~= false then
+            resultAction.knockback(target)
+        end
+
+        if resultAction.action then
+            resultAction.action(target, resultAction)
+        end
+    end
+
+    if resultAction.notBlockedAction then
+        resultAction.notBlockedAction(target, not valid, resultAction)
+    end
 end
 
 function DynamicEntity:AreaEffect(params)
@@ -193,69 +403,7 @@ function DynamicEntity:AreaEffect(params)
         end
 
         if allyFilter and passes and heroPasses and params.filter(target) then
-            local blocked = params.ability and target:AllowAbilityEffect(self, params.ability) == false
-            local isTree = instanceof(target, Obstacle)
-
-            if isTree and (params.damage ~= nil or params.damagesTrees) and not params.damagesTreesx2 then
-                target:DealOneDamage(self)
-            elseif isTree and params.damagesTreesx2 then
-                target:DealOneDamage(self)
-                target:DealOneDamage(self)
-            end
-
-            if params.modifier and not blocked then
-                local m = params.modifier
-
-                target:AddNewModifier(self, m.ability, m.name, { duration = m.duration })
-            end
-
-            if params.damage ~= nil and blocked then
-                target:OnBlockedAbilityDamage(self, params.ability, params.damage, params.isPhysical)
-            end
-
-            if params.damage ~= nil and not blocked then
-                target:Damage(self, params.damage, params.isPhysical)
-            end
-
-            if params.knockback and (not blocked or not params.ability) and not isTree then
-                local direction = params.knockback.direction and params.knockback.direction(target) or (target:GetPos() - self:GetPos())
-
-                local force = params.knockback.force
-                local decrease = params.knockback.decrease
-
-                if type(force) == "function" then
-                    force = force(target)
-                end
-
-                if type(decrease) == "function" then
-                    decrease = decrease(target)
-                end
-
-                SoftKnockback(target, self, direction, force or 20, {
-                    decrease = decrease,
-                    knockup = params.knockback.knockup
-                })
-            end
-
-            if params.action and not blocked then
-                params.action(target)
-            end
-
-            if params.notBlockedAction then
-                params.notBlockedAction(target, blocked)
-            end
-
-            if params.sound and not soundPlayed then
-                if type(params.sound) == "table" then
-                    for _, sound in pairs(params.sound) do
-                        self:EmitSound(sound, target:GetPos())
-                    end
-                else
-                    self:EmitSound(params.sound, target:GetPos())
-                end
-
-                soundPlayed = true
-            end
+            self:EffectToTarget(target, params)
 
             if not hurt then
                 hurt = {}

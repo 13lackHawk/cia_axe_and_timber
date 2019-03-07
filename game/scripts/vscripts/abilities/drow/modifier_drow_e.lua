@@ -39,12 +39,17 @@ if IsServer() then
             graphics = "particles/drow_q/drow_q.vpcf",
             distance = 300,
             hitSound = "Arena.Drow.HitA",
-            hitFunction = function(projectile, victim)
-                if self.damaged[victim] == nil then
-                    victim:Damage(projectile, damage)
-                end
-
-                self.damaged[victim] = true
+            hitParams = function(projectile, victim)
+                return {
+                    damage = function(target)
+                        if self.damaged[target] == nil then
+                            return 2
+                        end
+                    end,
+                    action = function(victim)
+                        self.damaged[victim] = true
+                    end
+                }
             end
         }):Activate()
     end

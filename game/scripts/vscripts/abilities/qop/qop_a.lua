@@ -15,15 +15,20 @@ function qop_a:OnSpellStart()
         distance = 1000,
         damagesTrees = true,
         hitSound = "Arena.QOP.HitA",
-        hitFunction = function(projectile, victim)
-            local damage = self:GetDamage()
-            if instanceof(victim, UnitEntity) then
-                if victim:GetUnit():GetIdealSpeed() < victim:GetUnit():GetBaseMoveSpeed() then
-                    damage = damage * 2
-                end
-            end
+        hitParams = function(projectile, victim)
+            return {
+                damage = function(target)
+                    local damage = self:GetDamage()
+                    if instanceof(victim, UnitEntity) then
+                        if victim:GetUnit():GetIdealSpeed() < victim:GetUnit():GetBaseMoveSpeed() then
+                            damage = damage * 2
+                        end
+                    end
 
-            victim:Damage(projectile, damage, true)
+                    return damage
+                end,
+                isPhysical = true
+            }
         end
     }):Activate()
 

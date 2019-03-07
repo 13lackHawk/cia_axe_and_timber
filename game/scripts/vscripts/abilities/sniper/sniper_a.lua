@@ -20,9 +20,11 @@ function sniper_a:OnSpellStart()
         graphics = "particles/sniper_q/sniper_q.vpcf",
         radius = 48,
         hitSound = "Arena.Sniper.HitA",
-        nonBlockedHitAction = function()
-            hero:StopSound("Arena.Sniper.FlyA")
-        end,
+        hitParams = {
+            notBlockedAction = function()
+                hero:StopSound("Arena.Sniper.FlyA")
+            end
+        },
         knockback = { force = 20, decrease = 3 },
         damage = self:GetDamage(),
         isPhysical = true

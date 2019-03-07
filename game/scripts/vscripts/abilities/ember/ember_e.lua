@@ -12,7 +12,7 @@ function ember_e:OnSpellStart()
         forceFacing = true,
         hitParams = {
             ability = self,
-            action = function(target)
+            modifier = function(target)
                 if EmberUtil.Burn(hero, target, self) then
                     target:AddNewModifier(hero, self, "modifier_stunned_lua", { duration = 1.0 })
                 end

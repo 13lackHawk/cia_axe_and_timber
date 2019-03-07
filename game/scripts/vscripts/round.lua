@@ -69,7 +69,15 @@ function Round:CheckEndConditions()
     end
 
     local lastAlive, amountAlive = self:GetLastOrNoneAlive()
-    return amountAlive <= 1
+    if IsInToolsMode() then
+        if GameRules.GameMode.roundNumber > 2 then
+            return amountAlive <= 0
+        else
+            return amountAlive <= 0
+        end
+    else
+        return amountAlive <= 1
+    end
 end
 
 function Round:EndRound()

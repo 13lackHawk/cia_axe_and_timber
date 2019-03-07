@@ -22,15 +22,15 @@ function modifier_invoker_w:CheckState()
     }
 end
 
-function modifier_invoker_w:OnDamageReceived(source, hero, amount, isPhysical)
+function modifier_invoker_w:GetDamageChange(source, hero, amount, isPhysical)
     if not isPhysical then
-        return amount * 2
+        return amount
     end
 
     return false
 end
 
-function modifier_invoker_w:OnDamageReceivedPriority()
+function modifier_invoker_w:GetDamageChangePriority()
     return PRIORITY_AMPLIFY_DAMAGE
 end
 

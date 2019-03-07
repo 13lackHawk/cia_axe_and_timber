@@ -42,11 +42,18 @@ function EntityTinkerR:Update()
             if instanceof(target, Projectile) then
                 local velocity = target.vel
                 local reflectedDirection = velocity - 2 * (velocity:Dot(normal)) * normal;
-                target:Deflect(self, reflectedDirection)
-            else
+                target:Deflect(self.hero, reflectedDirection) 
+            end
+        end,
+        damage = function(target)
+            if not instanceof(target, Projectile) then
+                return self.ability:GetDamage()
+            end
+        end,
+        knockback = function(target)
+            if not instanceof(target, Projectile) then
                 self.round.spells:InterruptDashes(target)
-                SoftKnockback(target, self, normal, 50, { decrease = 3 })
-                target:Damage(self, self.ability:GetDamage())
+                SoftKnockback(target, self, (target:GetPos() - self:GetPos()):Normalized(), 50, { decrease = 3 })
             end
         end,
         notBlockedAction = function(target)

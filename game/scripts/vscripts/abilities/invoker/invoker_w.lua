@@ -17,7 +17,7 @@ function invoker_w:OnSpellStart()
         distance = 1200,
         hitSound = "Arena.Invoker.HitW",
         hitModifier = { name = "modifier_invoker_w", duration = 1.8, ability = self },
-        hitFunction = function() end,
+        hitParams = {},
         destroyOnDamage = false
     }):Activate()
 

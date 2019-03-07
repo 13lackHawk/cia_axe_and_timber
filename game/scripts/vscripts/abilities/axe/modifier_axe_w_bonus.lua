@@ -10,11 +10,11 @@ end
 
 function modifier_axe_w_bonus:GetModifierMoveSpeedBonus_Percentage(params)
     return 25
-end
+end]]--
 
 function modifier_axe_w_bonus:IsInvulnerable()
     return true
-end]]--
+end
 
 function modifier_axe_w_bonus:GetEffectName()
     return "particles/axe_w/axe_w.vpcf"

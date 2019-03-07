@@ -7,20 +7,11 @@ function cm_a:OnSpellStart()
     local target = self:GetCursorPosition()
     local mod = hero:FindModifier("modifier_cm_a")
     local graphics = "particles/cm_a/cm_a.vpcf"
-    local action
+    local empowered
 
     if mod and mod:GetStackCount() == 3 then
         graphics = "particles/cm_a/cm_a_empowered.vpcf"
-
-        action = function(projectile, target)
-            target:Damage(projectile, self:GetDamage())
-
-            if CMUtil.IsFrozen(target) then
-                CMUtil.Stun(projectile:GetTrueHero(), target, self)
-            end
-
-            CMUtil.Freeze(projectile:GetTrueHero(), target, self)
-        end
+        empowered = true
 
         mod:Destroy()
     end
@@ -35,7 +26,24 @@ function cm_a:OnSpellStart()
         radius = 48,
         graphics = graphics,
         distance = 900,
-        hitFunction = action,
+        hitParams = function(projectile, target)
+            local modifier
+
+            if empowered then
+                modifier = function(target)
+                    if CMUtil.IsFrozen(target) then
+                        CMUtil.Stun(projectile:GetTrueHero(), target, self)
+                    end
+
+                    CMUtil.Freeze(projectile:GetTrueHero(), target, self)
+                end
+            end
+
+            return {
+                damage = self:GetDamage(),
+                modifier = modifier
+            }
+        end,
         hitSound = "Arena.CM.HitA",
         isPhysical = true
     }):Activate()

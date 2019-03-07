@@ -28,8 +28,13 @@ if IsServer() then
         end
 
         if shouldBeAffectedByAbility then
-            target:AddNewModifier(target, self:GetAbility(), "modifier_silence_lua", { duration = 2.0 })
-            target:Damage(caster, 2)
+            self:GetAbility():GetCaster():GetParentEntity():EffectToTarget(target, {
+                ability = self:GetAbility(),
+                damage = 2,
+                modifier = function(target)
+                    target:AddNewModifier(target, self:GetAbility(), "modifier_silence_lua", { duration = 2.0 })
+                end,
+            })
             target:EmitSound("Arena.Void.ProcW")
 
             self:Destroy()

@@ -20,8 +20,8 @@ function void_e_sub:OnSpellStart()
         hitParams = {
             ability = self,
             sound = "Arena.Void.HitE.Sub",
-            action = function(target)
-                target:Damage(hero, 2)
+            damage = 2,
+            modifier = function(target)
                 target:AddNewModifier(hero, self, "modifier_void_e_slow", { duration = 2.0 })
             end
         }

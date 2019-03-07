@@ -45,7 +45,7 @@ function brew_q:OnSpellStart()
             filter = Filters.Area(target, 200),
             filterProjectiles = true,
             onlyHeroes = true,
-            action = function(victim)
+            modifier = function(victim)
                 self:AddBeerModifier(victim)
             end
         },

@@ -71,15 +71,19 @@ function LycanWolf:Update()
     end
 
     if self:FindModifier("modifier_lycan_q"):GetRemainingTime() <= 0 then
-        local blocked = self.attacking and self.attacking:AllowAbilityEffect(self, self.ability) == false
-
         if not blocked and self.attacking and self.attacking:Alive() then
             local distance = (self.attacking:GetPos() - self:GetPos()):Length2D()
 
             if distance <= 250 then
-                self.attacking:Damage(self, self.ability:GetDamage())
                 self:EmitSound("Arena.Lycan.HitQ2")
-                LycanUtil.MakeBleed(self.hero, self.attacking)
+                
+                self:EffectToTarget(self.attacking, {
+                    ability = self.ability,
+                    damage = self.ability:GetDamage(),
+                    modifier = function(target)
+                        LycanUtil.MakeBleed(self.hero, target)
+                    end
+                })
             end
         end
 

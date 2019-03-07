@@ -55,25 +55,32 @@ function WKSkeleton:Update()
     end
 
     if self:FindModifier("modifier_wk_skeleton"):GetRemainingTime() <= 0 then
-        local blocked = self.attacking and self.attacking:AllowAbilityEffect(self, self.ability) == false
-
         if self.attacking and self.attacking:Alive() and not blocked then
             local distance = (self.attacking:GetPos() - self:GetPos()):Length2D()
 
             if distance <= 250 then
-                local modifier = self.attacking:FindModifier("modifier_wk_q")
+                self:EffectToTarget(self.attacking, {
+                    ability = self.ability,
+                    damage = function(target)
+                        local modifier = target:FindModifier("modifier_wk_q")
 
-                if not modifier then
-                    modifier = self.attacking:AddNewModifier(self.hero, self.ability, "modifier_wk_q", { duration = 3 })
-                end
+                        if not modifier or modifier:GetStackCount() <= 2 then
+                            return self.ability:GetDamage() / 3
+                        end
+                    end,
+                    modifier = function(target)
+                        local modifier = target:FindModifier("modifier_wk_q")
 
-                if modifier then
-                    modifier:IncrementStackCount()
+                        if not modifier then
+                            modifier = target:AddNewModifier(self.hero, self.ability, "modifier_wk_q", { duration = 3 })
+                        end
 
-                    if modifier:GetStackCount() <= 3 then
-                        self.attacking:Damage(self, self.ability:GetDamage() / 3)
+                        if modifier then
+                            modifier:IncrementStackCount()
+                        end
                     end
-                end
+                })
+                
 
                 self:EmitSound("Arena.WK.HitQ2")
             end

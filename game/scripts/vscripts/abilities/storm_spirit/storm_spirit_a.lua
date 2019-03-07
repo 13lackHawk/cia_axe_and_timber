@@ -27,9 +27,13 @@ function storm_spirit_a:OnSpellStart()
     if charged then
         data.damagesTrees = true
 
-        data.hitFunction = function(projectile, _)
-            projectile.hitSomething = true
-            projectile:Destroy()
+        data.hitParams = function(projectile, _)
+            return {
+                action = function(target)
+                    projectile.hitSomething = true
+                    projectile:Destroy()
+                end
+            }
         end
 
         data.destroyFunction = function(projectile)

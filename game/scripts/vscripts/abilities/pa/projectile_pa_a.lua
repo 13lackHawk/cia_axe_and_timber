@@ -21,28 +21,38 @@ function ProjectilePAA:constructor(round, hero, target, damage, ability)
 
     self.vel = self.vel * self:GetSpeed()
     self.hitGroup[hero] = self.gracePeriod
-    self.hitFunction = function(self, target)
-        if target == self.hero then
-            self.hero:WeaponRetrieved()
-            target:EmitSound("Arena.PA.Catch")
-            self:Destroy()
-        else
-            target:EmitSound("Arena.PA.HitQ")
-            target:Damage(self, damage, self.isPhysical)
+    self.hitParams = function(self, target)
+        return {
+            action = function(target)
+                if target == self.hero then
+                    self.hero:WeaponRetrieved()
+                    target:EmitSound("Arena.PA.Catch")
+                    self:Destroy()
+                else
+                    target:EmitSound("Arena.PA.HitQ")
+                    local direction = (target:GetPos() - self:GetPos()):Normalized()
+                    local blood = ImmediateEffect("particles/units/heroes/hero_riki/riki_backstab_hit_blood.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+                    ParticleManager:SetParticleControlEnt(blood, 0, target:GetUnit(), PATTACH_POINT_FOLLOW, "attach_hitloc", target:GetPos(), true)
+                    ParticleManager:SetParticleControlForward(blood, 0, direction)
+                    ParticleManager:SetParticleControl(blood, 2, direction * 1000)
+                end
+            end,
+            damage = function(target)
+                if target ~= self.hero then
+                    return 1
+                end
+            end,
+            modifier = function(target)
+                if target ~= self.hero then
+                    local silenceAbilitySource = hero:FindAbility("pa_r")
 
-            local direction = (target:GetPos() - self:GetPos()):Normalized()
-            local blood = ImmediateEffect("particles/units/heroes/hero_riki/riki_backstab_hit_blood.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-            ParticleManager:SetParticleControlEnt(blood, 0, target:GetUnit(), PATTACH_POINT_FOLLOW, "attach_hitloc", target:GetPos(), true)
-            ParticleManager:SetParticleControlForward(blood, 0, direction)
-            ParticleManager:SetParticleControl(blood, 2, direction * 1000)
-
-            local silenceAbilitySource = hero:FindAbility("pa_r")
-
-            if hero:HasModifier("modifier_pa_r") and target:AllowAbilityEffect(hero, silenceAbilitySource) then
-                target:AddNewModifier(hero, silenceAbilitySource, "modifier_silence_lua", { duration = 0.75 })
-                target:EmitSound("Arena.PA.HitR.Silence")
-            end
-        end
+                    if hero:FindModifier("modifier_pa_r") then
+                        target:AddNewModifier(hero, silenceAbilitySource, "modifier_silence_lua", { duration = 0.75 })
+                        target:EmitSound("Arena.PA.HitR.Silence")
+                    end
+                end
+            end,
+        }
     end
 
     self.timesDeflected = 0

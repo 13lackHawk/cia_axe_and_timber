@@ -20,11 +20,11 @@ function ember_a:OnSpellStart()
         ability = self,
         filter = Filters.Cone(pos, range, forward, math.pi),
         sound = "Arena.Ember.HitA",
-        action = function(target)
+        damage = function(target)
             if EmberUtil.IsBurning(target) then
-                target:Damage(hero, damage * 2, true)
+                return self:GetDamage() * 2
             else
-                target:Damage(hero, damage, true)
+                return self:GetDamage()
             end
         end,
         knockback = { force = 20, decrease = 3 },

@@ -23,7 +23,7 @@ function self:GetEffectAttachType()
     return PATTACH_ROOTBONE_FOLLOW
 end
 
-function self:OnDamageReceived(source, hero, amount)
+function self:OnDamageReceived(source, hero, amount, type)
     if not self.soundPlayed then
         hero:EmitSound("Arena.Timber.ProcW")
         self.soundPlayed = true
@@ -34,12 +34,20 @@ function self:OnDamageReceived(source, hero, amount)
     if source:FindModifier("modifier_timber_w") then
         if not self.damageSource and source.owner.team ~= hero.owner.team and amount > 0 then
             source:FindModifier("modifier_timber_w").damageSource = true
-            source:Damage(hero, amount)
+            hero:EffectToTarget(source, {
+                ability = self:GetAbility(),
+                damage = amount,
+                isPhysical = type
+            })
             return amount
         end
     else
         self.damageSource = false
-        source:Damage(hero, amount)
+        hero:EffectToTarget(source, {
+            ability = self:GetAbility(),
+            damage = amount,
+            isPhysical = type
+        })
         return amount
     end
     
