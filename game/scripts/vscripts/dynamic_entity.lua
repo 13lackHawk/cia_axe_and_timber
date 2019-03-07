@@ -262,11 +262,12 @@ function DynamicEntity:EffectToTarget(target, params)
         hero = self.heroOverride
     end
 
-    if isTree and ((params.damage ~= nil and params.damagesTrees ~= false) or params.damagesTrees) and not params.damagesTreesx2 then
-        target:DealOneDamage(self)
-    elseif isTree and params.damagesTreesx2 then
-        target:DealOneDamage(self)
-        target:DealOneDamage(self)
+    if isTree and ((params.damage ~= nil and params.damagesTrees ~= false) or params.damagesTrees) then
+        if type(params.damagesTrees) == "number" then
+            target:DealDamage(self, params.damagesTrees)
+        else
+            target:DealOneDamage(self)
+        end
     end
 
     if params.modifier then
@@ -390,8 +391,6 @@ function DynamicEntity:AreaEffect(params)
     if params.damage == true then
         params.damage = 3
     end
-
-    local soundPlayed = false
 
     for _, target in pairs(self.round.spells:GetValidTargets()) do
         local passes = not instanceof(target, Projectile) or ((IsAttackAbility(params.ability) and IsAttackAbility(target.ability)) or params.targetProjectiles)

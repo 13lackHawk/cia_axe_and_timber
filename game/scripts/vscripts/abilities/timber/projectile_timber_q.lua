@@ -41,11 +41,9 @@ function ProjectileTimberQ:constructor(round, hero, target, damage, ability)
     self.nextDamageAt = GameRules:GetGameTime() + 0.75
     self.isAlreadyHit = false
     self.soundIsPlayed = false
-    --self.recastCheck = false
     self.removeOnDeath = true
     self.direction = (target * Vector(1, 1, 0) - hero:GetPos() * Vector(1, 1, 0))
 
-    --self.vel = self.vel
     self.hitGroup[hero] = self.gracePeriod
 end
 
@@ -57,11 +55,6 @@ function ProjectileTimberQ:Update()
     if not self.goingBack then
         if self.distance <= self.distancePassed then
             self.vel = Vector()
-            --if self.hero:HasModifier("modifier_timber_q_recast") and self.recastCheck == false then -- stupid try to fix wrong recast duration
-                --self.recastCheck = true
-                --self.hero:RemoveModifier("modifier_timber_q_recast")
-                --self.hero:AddNewModifier(hero, self.ability, "modifier_timber_q_recast", { duration = 2.25 })
-            --end
             if self.soundIsPlayed == false then
                 self:EmitSound("Arena.Timber.LoopQ")
                 self.soundIsPlayed = true
@@ -73,7 +66,7 @@ function ProjectileTimberQ:Update()
         if GameRules:GetGameTime() >= self.nextDamageAt and self.distance <= self.distancePassed then
             if self.ticksPassed == 3 and not self.goingBack then
                 self.hero:SwapAbilities("timber_q_sub", "timber_q")
-                self.hero:FindAbility("timber_q"):StartCooldown(self.hero:FindAbility("timber_q"):GetCooldown(1))
+                self.ability:StartCooldown(self.ability:GetCooldown(1))
                 self:Retract()
             else
                 self:AreaEffect({
@@ -89,17 +82,12 @@ function ProjectileTimberQ:Update()
     else
         if (self.hero:GetPos() - self:GetPos()):Length2D() <= self:GetRad() then
             self.radius = 75
-            if (self.hero:GetPos() - self:GetPos()):Length2D() <= self:GetRad() then
-                self:Destroy()
-            end
+            self:Destroy()
         end
     end
 end
 
 function ProjectileTimberQ:Retract()
-    if self.hero:HasModifier("modifier_timber_q_recast") then
-        self.hero:RemoveModifier("modifier_timber_q_recast")
-    end
     self:StopSound("Arena.Timber.LoopQ")
     self.hero:EmitSound("Arena.Timber.EndQ")
     self.isAlreadyHit = false
@@ -111,7 +99,7 @@ end
 function ProjectileTimberQ:Deflect(by, direction)
     if not self.goingBack then
         self.hero:SwapAbilities("timber_q_sub", "timber_q")
-        self.hero:FindAbility("timber_q"):StartCooldown(self.hero:FindAbility("timber_q"):GetCooldown(1))
+        self.ability:StartCooldown(self.ability:GetCooldown(1))
         direction.z = 0
         self.direction = direction:Normalized()
         self.owner = by.owner

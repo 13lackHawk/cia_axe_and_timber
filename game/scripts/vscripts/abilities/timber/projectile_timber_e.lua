@@ -180,10 +180,7 @@ function DashTimberE:constructor(hero, target, ability, particle)
     getbase(DashTimberE).constructor(self, target, nil, 2400, {
         modifier = { name = "modifier_timber_e", ability = ability, source = ability:GetCaster() },
         heightFunction = heightFunction,
-        interruptedByStuns = true,
-        arrivalFunction = function() 
-            self.hero:GetWearableBySlot("weapon"):RemoveEffects(EF_NODRAW) 
-        end
+        interruptedByStuns = true
     })  
 
     self.timber = hero
@@ -206,5 +203,5 @@ function DashTimberE:End(...)
     ParticleManager:ReleaseParticleIndex(self.particle)
 
     self.timber:StopSound("Arena.Timber.CastE")
-    self.timber:GetWearableBySlot("weapon"):RemoveEffects(EF_NODRAW)
+    self.hero:GetWearableBySlot("weapon"):RemoveEffects(EF_NODRAW)
 end
