@@ -21,7 +21,7 @@ function timber_a:OnSpellStart()
         ability = self,
         filter = Filters.Cone(pos, range, forward, math.pi),
         sound = "Arena.Timber.HitA",
-        damagesTreesx2 = true,
+        damagesTrees = 2,
         damage = function(target)
             if instanceof(target, Rune) then
                 return damage * 2

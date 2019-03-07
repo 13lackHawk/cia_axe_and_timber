@@ -41,7 +41,11 @@ function Obstacle:GetPos()
 end
 
 function Obstacle:DealOneDamage(source)
-    self.health = self.health - 1
+    self:DealDamage(source, 1)
+end
+
+function Obstacle:DealDamage(source, amount)
+    self.health = self.health - amount
 
     local duration
 
@@ -55,13 +59,15 @@ function Obstacle:DealOneDamage(source)
 
     if self.health <= 0 then
         local hero = source
+        local graphics = nil
         if hero.hero then hero = hero.hero end
 
-        if hero:HasModifier("modifier_timber_heal_to_shield") then
-            TreeHealProjectile(nil, hero, hero, self:GetPos(), true):Activate()
-        else
-            TreeHealProjectile(nil, hero, hero, self:GetPos(), false):Activate()
+        if hero:GetName() == "npc_dota_hero_shredder" then
+            graphics = "particles/timber_shield_projectile/tree_shield_projectile.vpcf"
         end
+
+        TreeHealProjectile(nil, hero, hero, self:GetPos(), graphics):Activate()
+
         self:Destroy()
     else
         self:GetUnit():SetHealth(self.health)
@@ -195,18 +201,14 @@ end
 
 TreeHealProjectile = TreeHealProjectile or class({}, nil, HomingProjectile)
 
-function TreeHealProjectile:constructor(round, hero, target, pos, graphic)
-    local graphics = "particles/tree_heal_projectile.vpcf"
-    if graphic == true then
-        graphics = "particles/timber_shield_projectile/tree_shield_projectile.vpcf"
-    end
+function TreeHealProjectile:constructor(round, hero, target, pos, graphics)
     getbase(TreeHealProjectile).constructor(self, round, {
         owner = hero,
         from = pos + Vector(0, 0, 64),
         heightOffset = 64,
         target = target,
         speed = 900,
-        graphics = graphics,
+        graphics = graphics or "particles/tree_heal_projectile.vpcf",
         hitParams = function(projectile, target)
             return {
                 modifier = function(target)

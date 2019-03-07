@@ -1,13 +1,10 @@
 timber_q = class({})
 local self = timber_q
-self.chakram = nil
-
-LinkLuaModifier("modifier_timber_q_recast", "abilities/timber/modifier_timber_q_recast", LUA_MODIFIER_MOTION_NONE)
 
 require("abilities/timber/projectile_timber_q")
 
 function timber_q:OnSpellStart()
-	Wrappers.DirectionalAbility(self, 900)
+    Wrappers.DirectionalAbility(self, 900)
 
     local hero = self:GetCaster().hero
     local target = self:GetCursorPosition()
@@ -17,11 +14,10 @@ function timber_q:OnSpellStart()
 
     hero:SwapAbilities("timber_q", "timber_q_sub")
     hero:FindAbility("timber_q_sub"):StartCooldown(0.5)
-    hero:AddNewModifier(hero, self, "modifier_timber_q_recast", {})
 end
 
 function timber_q:GetChakram()
-	return self.chakram
+    return self.chakram
 end
 
 function timber_q:GetCastAnimation()

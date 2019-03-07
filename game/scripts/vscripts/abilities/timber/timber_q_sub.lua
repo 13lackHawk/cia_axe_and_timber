@@ -8,9 +8,6 @@ function timber_q_sub:OnSpellStart()
     self.chakram:Retract()
     self.hero:SwapAbilities("timber_q_sub", "timber_q")
     self.hero:FindAbility("timber_q"):StartCooldown(self.hero:FindAbility("timber_q"):GetCooldown(1))
-    if self.hero:HasModifier("modifier_timber_q_recast") then
-        self.hero:RemoveModifier("modifier_timber_q_recast")
-    end
 end
 
 if IsClient() then
