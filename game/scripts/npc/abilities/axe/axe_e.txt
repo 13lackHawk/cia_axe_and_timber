@@ -9,9 +9,12 @@
 
 		"TargetingIndicator" {
 			"Type" "TARGETING_INDICATOR_AOE"
+			"Arc" "100"
+			"ArcWidth" "50"
 			"Radius" "200"
-			"DisplayRange" "1"
+			"MinLength" "200"
 			"MaxLength" "600"
+			"DisplayRange" "1"
 		}
 
 		"HoverIndicator" {

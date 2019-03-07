@@ -31,13 +31,16 @@ function axe_r:OnChannelFinish(interrupted)
     local hitSomething = false
 
     hero:SetPos(hero:GetPos() * Vector(1, 1, 0) + Vector(0, 0, 32))
+    TimedEntity(0.01, function()
+        hero:SetPos(hero:GetPos() * Vector(1, 1, 0) + Vector(0, 0, 0))
+    end):Activate()
 
     if interrupted then
         hero:StopSound("Arena.WK.PreR")
         return
     end
 
-    local direction = target - hero:GetPos()
+    local direction = (target - hero:GetPos() ) * Vector(1,1,0)
 
     if direction:Length2D() == 0 then
         direction = hero:GetFacing()
@@ -67,10 +70,6 @@ function axe_r:OnChannelFinish(interrupted)
 
     local len = (target - start):Length2D()
     local stopTimer = 0
-
-    --local effect = ImmediateEffect("particles/units/heroes/hero_elder_titan/elder_titan_earth_splitter.vpcf", PATTACH_ABSORIGIN, hero)
-    --ParticleManager:SetParticleControl(effect, 0, hero:GetPos() + direction:Normalized() * 64)
-    --ParticleManager:SetParticleControl(effect, 1, target)
 
     DistanceCappedProjectile(hero.round, {
         ability = self,
@@ -115,14 +114,6 @@ function axe_r:OnChannelFinish(interrupted)
             }
         end
     }):Activate()
-
-    --[[local hurt = hero:AreaEffect({
-        ability = self,
-        filter = Filters.Line(hero:GetPos(), target, 300),
-        sound = "Arena.WK.HitR",
-        damage = self:GetDamage(),
-        modifier = { name = "modifier_stunned_lua", duration = 1.5, ability = self }
-    })]]--
 
     currentLen = 128
     target = casterPos

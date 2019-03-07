@@ -15,8 +15,9 @@ function axe_e:OnSpellStart()
 
     hero:EmitSound("Arena.Axe.CastE")
 
-    if distance >= 200 then
-        BestJump = target + dir * -100
+    if distance <= 200 then
+        BestJump = hero:GetPos() + dir * 200
+        target = BestJump
     end
 
     FunctionDash(hero, BestJump, 0.35, {
