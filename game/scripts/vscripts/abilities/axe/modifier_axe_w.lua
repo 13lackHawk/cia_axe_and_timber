@@ -22,11 +22,13 @@ function self:AllowAbilityEffect(source, ability, data)
     
     if data and data.damage then
         local damage = data.damage.count
-        caster:AddNewModifier(caster, caster:FindAbility("axe_w"), "modifier_axe_w_dmg", { duration = 2.5 }):GetDmg(source, damage, data.damage.type, ability)
-        self.damageReceived = damage
-        self:Destroy()
+        if data.damage.count > 0 then
+            caster:AddNewModifier(caster, caster:FindAbility("axe_w"), "modifier_axe_w_dmg", { duration = 2.5 }):GetDmg(source, damage, data.damage.type, ability)
+            self.damageReceived = damage
+            self:Destroy()
 
-        return false
+            return false
+        end
     end
 end
 

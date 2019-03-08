@@ -209,7 +209,7 @@ function DynamicEntity:CalculateDamage(source, damage, physical, amplifies)
         if type(change) == "number" then
             damage = damage + change
         elseif change == false then
-            return false
+            return 0
         end
     end
 
@@ -220,7 +220,7 @@ function DynamicEntity:CalculateDamage(source, damage, physical, amplifies)
             if type(change) == "number" then
                 damage = damage + change
             elseif change == false then
-                return false
+                return 0
             end
         end
     end
@@ -288,11 +288,11 @@ function DynamicEntity:EffectToTarget(target, params)
             damage = params.damage(target)
         end
 
-        local resultDmg = target:CalculateDamage(hero, damage, params.isPhysical, params.damageAmplifies)
+        if damage then
+            local resultDmg = target:CalculateDamage(hero, damage, params.isPhysical, params.damageAmplifies)
 
-        if type(resultDmg) == "number" and resultDmg > 0 then
             resultAction.damage = {}
-            resultAction.damage.count = resultDmg
+            resultAction.damage.count = math.max(resultDmg, 0)
             resultAction.damage.real = damage
             resultAction.damage.type = params.isPhysical
         end
@@ -363,7 +363,7 @@ function DynamicEntity:EffectToTarget(target, params)
     end
 
     if not (invulnerableTarget or isTree) and resultAction then
-        if resultAction.damage and params.dealDamage ~= false then
+        if resultAction.damage and params.dealDamage ~= false and resultAction.damage.count > 0 then
             target:Damage(self, resultAction.damage.count, resultAction.damage.type, false)
         end
 
