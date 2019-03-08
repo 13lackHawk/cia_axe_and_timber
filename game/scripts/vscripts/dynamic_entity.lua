@@ -364,7 +364,7 @@ function DynamicEntity:EffectToTarget(target, params)
 
     if not (invulnerableTarget or isTree) and resultAction then
         if resultAction.damage and params.dealDamage ~= false then
-            target:Damage(hero, resultAction.damage.count, resultAction.damage.type, false)
+            target:Damage(self, resultAction.damage.count, resultAction.damage.type, false)
         end
 
         if resultAction.modifier and params.createModifier ~= false then
