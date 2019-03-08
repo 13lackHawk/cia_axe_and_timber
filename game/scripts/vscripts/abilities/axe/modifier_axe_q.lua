@@ -52,3 +52,7 @@ end
 function modifier_axe_q:OnDamageReceivedPriority()
     return PRIORITY_POST_SHIELD_ACTION - 1
 end
+
+function modifier_axe_q:IsDebuff()
+    return true
+end

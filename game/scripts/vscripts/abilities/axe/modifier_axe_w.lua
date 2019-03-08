@@ -41,11 +41,12 @@ if IsServer() then
             hero:AddNewModifier(hero, hero:FindAbility("axe_w"), "modifier_axe_w_bonus", { duration = duration })
 
             FX("particles/axe_w/axe_w_explosion.vpcf", PATTACH_WORLDORIGIN, hero, {
-                    cp0 = self:GetParent():GetAbsOrigin(),
-                    cp1 = Vector(300, 1, 1),
-                    cp0 = self:GetParent():GetAbsOrigin(),
-                    release = true
+                cp0 = self:GetParent():GetAbsOrigin(),
+                cp1 = Vector(300, 1, 1),
+                cp0 = self:GetParent():GetAbsOrigin(),
+                release = true
             })
+            
             local mod = hero:FindModifier("modifier_axe_counter")
             if mod:GetStackCount() < 3 and not hero:FindModifier("modifier_axe_rage") then
                 mod:IncrementStackCount()
