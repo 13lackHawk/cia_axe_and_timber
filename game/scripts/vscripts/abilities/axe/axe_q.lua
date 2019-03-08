@@ -28,19 +28,13 @@ function axe_q:OnSpellStart()
                 end,
                 damage = self:GetDamage(),
                 action = function(victim)
-                    if not instanceof(victim, Obstacle) then
-                        hitSomething = true
+                    if projectile.heroOverride or instanceof(victim, Projectile) then return end
+                    local mod = hero:FindModifier("modifier_axe_counter")
+                    if mod:GetStackCount() < 3 and not hero:FindModifier("modifier_axe_rage") then
+                        mod:IncrementStackCount()
                     end
                 end
             }
-        end,
-        destroyFunction = function()
-            if hitSomething == true then
-                local mod = hero:FindModifier("modifier_axe_counter")
-                if mod:GetStackCount() < 3 and not hero:FindModifier("modifier_axe_rage") then
-                    mod:IncrementStackCount()
-                end
-            end
         end
     }):Activate()
 

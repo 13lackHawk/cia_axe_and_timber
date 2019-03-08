@@ -1,4 +1,4 @@
-<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf10:version{b5ef673d-0450-4fb0-a91b-bacae6864827} -->
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf19:version{aafc65d8-7a5a-4e01-bd8d-3ac118422503} -->
 {
 	_class = "CParticleSystemDefinition"
 	m_flConstantRadius = 30.0
@@ -83,12 +83,23 @@
 			m_CollisionGroupName = "DEBRIS"
 			m_bIncludeWater = true
 		},
+		{
+			_class = "C_INIT_GlobalScale"
+			m_nScaleControlPointNumber = 1
+			m_nControlPointNumber = -1
+			m_bScaleRadius = false
+			m_bScaleVelocity = false
+		},
 	]
 	m_Emitters = 
 	[
 		{
 			_class = "C_OP_ContinuousEmitter"
-			m_flEmitRate = 50.0
+			m_flEmitRate = 
+			{
+				m_nType = "PF_TYPE_LITERAL"
+				m_flLiteralValue = 50.0
+			}
 		},
 	]
 	m_Children = 

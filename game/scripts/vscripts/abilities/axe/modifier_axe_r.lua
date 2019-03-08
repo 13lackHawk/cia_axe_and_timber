@@ -19,3 +19,7 @@ end
 function modifier_axe_r:GetEffectAttachType()
     return PATTACH_ABSORIGIN_FOLLOW
 end
+
+function modifier_axe_r:IsDebuff()
+	return true
+end

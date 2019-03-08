@@ -11,7 +11,6 @@ if IsServer() then
         self:GetParent():MoveToNPC(self:GetCaster())
 
         local hero = self:GetCaster().hero
-        --local victim = self:GetParent().hero
 
         for _, target in pairs(hero.round.spells:GetHeroTargets()) do
             local distance = (target:GetPos() - hero:GetPos()):Length2D()
@@ -42,4 +41,18 @@ function modifier_axe_q:CheckState()
     }
  
     return state
+end
+
+function modifier_axe_q:OnDamageReceived(source, hero, amount)
+    if amount > 0 then
+        self:Destroy()
+    end
+end
+
+function modifier_axe_q:OnDamageReceivedPriority()
+    return PRIORITY_POST_SHIELD_ACTION - 1
+end
+
+function modifier_axe_q:IsDebuff()
+    return true
 end

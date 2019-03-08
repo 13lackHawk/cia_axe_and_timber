@@ -1,17 +1,11 @@
 modifier_timber_w = class({})
 local self = modifier_timber_w
-self.targets = {}
 
 if IsServer() then
-    function self:OnCreated() 
-        self.targets[self:GetParent():GetParentEntity()] = true
-    end
 
     function self:OnDestroy()
         local hero = self:GetParent():GetParentEntity()
         hero:FindAbility("timber_a"):SetActivated(true)
-        
-        self.targets[self:GetParent():GetParentEntity()] = nil
     end
 end
 
@@ -23,37 +17,44 @@ function self:GetEffectAttachType()
     return PATTACH_ROOTBONE_FOLLOW
 end
 
-function self:OnDamageReceived(source, hero, amount, type)
-    if not self.soundPlayed then
-        hero:EmitSound("Arena.Timber.ProcW")
-        self.soundPlayed = true
+function self:AllowAbilityEffect(source, ability, data)
+    local damage = 0
+    local phys
+    local hero = self:GetParent():GetParentEntity()
+
+    if data and data.damage then 
+        damage = data.damage.count 
+        phys = data.damage.type
     end
 
-    if source.hero then source = source.hero end
+    if source.owner.team == hero.owner.team or damage <= 0 then return end
 
-    if source:FindModifier("modifier_timber_w") then
-        if not self.damageSource and source.owner.team ~= hero.owner.team and amount > 0 then
-            source:FindModifier("modifier_timber_w").damageSource = true
-            hero:EffectToTarget(source, {
-                ability = self:GetAbility(),
-                damage = amount,
-                isPhysical = type
-            })
-            return amount
+    hero:EffectToTarget(source, {
+        ability = self:GetAbility(),
+        damage = damage,
+        isPhysical = phys,
+        dealDamage = false,
+        ignoreAllowAbilityCheck = true,
+        action = function(target)
+            local target = target.hero or target
+            local amplifiedDamage = target:CalculateDamage(hero, damage, phys)
+            local resultAction = { damage = { count = amplifiedDamage, type = phys, real = damage }, action = function() end }
+
+            for _, modifier in pairs(target:AllModifiers()) do
+                if modifier.AllowAbilityEffect and modifier:GetName() ~= self:GetName() then
+                    local val = modifier:AllowAbilityEffect(hero, self:GetAbility(), resultAction)
+
+                    if val == false then
+                        resultAction = {}
+                    elseif type(val) == "table" then
+                        resultAction = val
+                    end
+                end
+            end
+
+            if resultAction.damage and resultAction.damage.count > 0 and not target:IsInvulnerable() then
+                target:Damage(hero, amplifiedDamage, resultAction.damage.type, false)
+            end
         end
-    else
-        self.damageSource = false
-        hero:EffectToTarget(source, {
-            ability = self:GetAbility(),
-            damage = amount,
-            isPhysical = type
-        })
-        return amount
-    end
-    
-    return amount
-end
-
-function self:OnDamageReceivedPriority()
-    return PRIORITY_ABSOLUTE_SHIELD
+    })
 end

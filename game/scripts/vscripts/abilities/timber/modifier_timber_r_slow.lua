@@ -1,8 +1,19 @@
 modifier_timber_r_slow = class({})
 local self = modifier_timber_r_slow
 
+if IsServer() then
+	function self:OnCreated()
+		local index = FX("particles/timber_r/timber_r_slow.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent(), {
+			cp3 = { ent = self:GetParent() },
+			cp2 = { ent = self:GetParent() },
+			cp0 = { ent = self:GetParent() }
+		})
+		self:AddParticle(index, false, false, -1, false, false)
+	end
+end
+
 function self:GetTexture()
-    return "disruptor_thunder_strike"
+	return "arc_warden_flux"
 end
 
 function self:DeclareFunctions()
@@ -23,12 +34,4 @@ end
 
 function self:StatusEffectPriority()
     return 2
-end
-
-function self:GetStatusEffectName()
-    return "particles/status_fx/status_effect_shredder_whirl.vpcf"
-end
-
-function self:GetEffectAttachType()
-    return PATTACH_ABSORIGIN_FOLLOW
 end
