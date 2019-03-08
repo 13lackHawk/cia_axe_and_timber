@@ -55,3 +55,7 @@ end
 function self:GetAttributes()
     return MODIFIER_ATTRIBUTE_MULTIPLE
 end
+
+function self:IsHidden()
+    return true
+end

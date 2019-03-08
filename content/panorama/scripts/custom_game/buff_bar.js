@@ -20,7 +20,7 @@ var modifiersWithStacks = [
     "modifier_pa_a",
     "modifier_void_e_counter",
     "modifier_shield",
-    "modifier_timber_r_charges",
+    "modifier_timber_r_slow",
     "modifier_axe_counter"
 ];
 

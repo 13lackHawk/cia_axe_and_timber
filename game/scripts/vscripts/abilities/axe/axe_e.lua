@@ -15,6 +15,7 @@ function axe_e:OnSpellStart()
     hero:SetFacing(dir)
 
     hero:EmitSound("Arena.Axe.CastE")
+    local maxHeight = (hero:GetPos() - target + 200 * dir):Length2D() / 4.8
 
     FunctionDash(hero, target - 200 * dir, 0.35, {
         noFixedDuration = true,
@@ -22,7 +23,9 @@ function axe_e:OnSpellStart()
             local d = (dash.from - dash.to):Length2D()
             local x = (dash.from - current):Length2D()
 
-            return ParabolaZ(125, d, x)
+            print(maxHeight)
+
+            return ParabolaZ(maxHeight, d, x)
         end,
         arrivalFunction = function()
             FX("particles/units/heroes/hero_centaur/centaur_warstomp.vpcf", PATTACH_ABSORIGIN, hero, {
