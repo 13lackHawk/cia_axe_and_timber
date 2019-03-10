@@ -15,15 +15,13 @@ function axe_e:OnSpellStart()
     hero:SetFacing(dir)
 
     hero:EmitSound("Arena.Axe.CastE")
-    local maxHeight = (hero:GetPos() - target + 200 * dir):Length2D() / 4.8
+    local maxHeight = (hero:GetPos() - target):Length2D() / 4.8
 
-    FunctionDash(hero, target - 200 * dir, 0.35, {
+    FunctionDash(hero, target - 175 * dir, 0.35, {
         noFixedDuration = true,
         heightFunction = function(dash, current)
             local d = (dash.from - dash.to):Length2D()
             local x = (dash.from - current):Length2D()
-
-            print(maxHeight)
 
             return ParabolaZ(maxHeight, d, x)
         end,
@@ -40,19 +38,16 @@ function axe_e:OnSpellStart()
                 ability = self,
                 filter = Filters.Area(target, 200),
                 damage = self:GetDamage(),
-                knockback = { force = 50, decrease = 5 },
+                knockback = { force = 50, decrease = 5, direction = function(victim) return (victim:GetPos() - target):Normalized() end },
                 action = function(victim)
-                    if instanceof(victim, UnitEntity) then
-                        hit = true
+                    local mod = hero:FindModifier("modifier_axe_counter")
+                    if instanceof(victim, Hero) or instanceof(victim, Rune) then
+                        if mod:GetStackCount() < 3 and not hero:FindModifier("modifier_axe_rage") then
+                            mod:IncrementStackCount()
+                        end
                     end
                 end
             })
-            local mod = hero:FindModifier("modifier_axe_counter")
-            if hit then
-                if mod:GetStackCount() < 3 and not hero:FindModifier("modifier_axe_rage") then
-                    mod:IncrementStackCount()
-                end
-            end
 
             hero:EmitSound("Arena.LC.HitQ")
 

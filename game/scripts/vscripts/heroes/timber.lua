@@ -14,6 +14,10 @@ end
 function Timber:Heal(amount)
     local modifierShield = self.unit:FindModifierByName("modifier_shield")
 
+    if amount == nil then
+        amount = 3
+    end
+
     if self.unit:IsAlive() then
         if not modifierShield then
             modifierShield = self.unit:AddNewModifier(self.unit, nil, "modifier_shield", {})
