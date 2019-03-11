@@ -1,7 +1,7 @@
 modifier_axe_w_bonus = class({})
 
-function modifier_axe_w_bonus:IsInvulnerable()
-    return true
+function modifier_axe_w_bonus:AllowAbilityEffect(source)
+    return source.owner.team == self:GetParent():GetParentEntity().owner.team
 end
 
 function modifier_axe_w_bonus:GetEffectName()
