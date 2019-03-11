@@ -4,6 +4,10 @@ function modifier_axe_w_bonus:AllowAbilityEffect(source)
     return source.owner.team == self:GetParent():GetParentEntity().owner.team
 end
 
+function modifier_axe_w_bonus:GetDamageChange()
+    return false
+end
+
 function modifier_axe_w_bonus:GetEffectName()
     return "particles/axe_w/axe_w.vpcf"
 end
