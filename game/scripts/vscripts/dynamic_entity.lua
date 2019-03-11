@@ -289,13 +289,13 @@ function DynamicEntity:EffectToTarget(target, params)
         end
 
         if damage then
-            local resultDmg = target:CalculateDamage(hero, damage, params.isPhysical, params.damageAmplifies)
+	        local resultDmg = target:CalculateDamage(hero, damage, params.isPhysical, params.damageAmplifies)
 
-            resultAction.damage = {}
-            resultAction.damage.count = math.max(resultDmg, 0)
-            resultAction.damage.real = damage
-            resultAction.damage.type = params.isPhysical
-        end
+	        resultAction.damage = {}
+	        resultAction.damage.count = math.max(resultDmg, 0)
+	        resultAction.damage.real = damage
+	        resultAction.damage.type = params.isPhysical
+	    end
     end
 
     if params.knockback then

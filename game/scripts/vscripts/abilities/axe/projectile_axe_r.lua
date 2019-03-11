@@ -26,9 +26,11 @@ function ProjectileAxeR:constructor(round, hero, target, ability, range)
                 action = function(target)
                 	if self.heroOverride then return end
                     local mod = hero:FindModifier("modifier_axe_counter")
-	                if mod:GetStackCount() < 3 and not hero:FindModifier("modifier_axe_rage") then
-	                    mod:IncrementStackCount()
-	                end
+                    if instanceof(target, Hero) or instanceof(target, Rune) then
+		                if mod:GetStackCount() < 3 and not hero:FindModifier("modifier_axe_rage") then
+		                    mod:IncrementStackCount()
+		                end
+		            end
                 end,
                 modifier = function(target)
                     target:AddNewModifier(hero, ability, "modifier_axe_r", { duration = 3.0 })

@@ -53,13 +53,8 @@ function ProjectileTimberE:CollideWith(target)
         end,
         modifier = function(target)
             if not ally then
-                local distanceRoot = self.distancePassed
-                local theFurtherTheBetter = 0.1 * (distanceRoot / 48.3)
-                if theFurtherTheBetter < 0.5 then
-                    theFurtherTheBetter = 0.5
-                end
                 if instanceof(target, Hero) then
-                    target:AddNewModifier(self.hero, self.ability, "modifier_timber_e_root", { duration = theFurtherTheBetter })
+                    target:AddNewModifier(self.hero, self.ability, "modifier_timber_e_root", { duration = math.max(self.distancePassed / 483, 0.5) })
                     target:AddNewModifier(self.hero, self.ability, "modifier_stunned", { duration = 0.05 })
                 end
             end
@@ -86,16 +81,10 @@ function ProjectileTimberE:CollideWith(target)
             end
         end,
         notBlockedAction = function(target, blocked)
-            if instanceof(target, Obstacle) and target.health > 1 then
+            if instanceof(target, Obstacle) then
                 self.hitSomething = true
-                target:DealOneDamage(self)
-                DashTimberE(target, self.hero, self.ability, self.particle)
                 self:Destroy()
-            elseif instanceof(target, Obstacle) and target.health == 1 then
-                self.hero:FindAbility("timber_e"):EndCooldown()
-                target:DealOneDamage(self)
-                self:RetractHook()
-                self.goingBack = true
+                DashTimberE(target, self.hero, self.ability, self.particle)
             end
 
             if not instanceof(target, Obstacle) and blocked then
@@ -176,24 +165,40 @@ end
 
 DashTimberE = DashTimberE or class({}, nil, Dash)
 
-function DashTimberE:constructor(hero, target, ability, particle)
-    getbase(DashTimberE).constructor(self, target, nil, 2400, {
+function DashTimberE:constructor(target, hero, ability, particle)
+    getbase(DashTimberE).constructor(self, hero, nil, 2400, {
         modifier = { name = "modifier_timber_e", ability = ability, source = ability:GetCaster() },
-        heightFunction = heightFunction,
-        interruptedByStuns = true
-    })  
+        interruptedByStuns = true,
+        arrivalFunction = function()
+            if instanceof(self.dashTarget, Obstacle) then
+                self.dashTarget:DealOneDamage(self.hero)
+            end
+        end
+    })
 
-    self.timber = hero
+    self.dashTarget = target
     self.particle = particle
+
+    if not target:Alive() then
+        self:End(self.hero:GetPos(), false)
+    end 
 end
 
 function DashTimberE:PositionFunction(current)
-    local diff = self.timber:GetPos() - current
+    local diff = self.dashTarget:GetPos() - current
     return current + (diff:Normalized() * self.velocity)
 end
 
+function DashTimberE:Update()
+    getbase(DashTimberE).Update(self)
+
+    if not self.dashTarget:Alive() then
+        self:End(self.hero:GetPos(), false)
+    end
+end
+
 function DashTimberE:HasEnded()
-    return not self.hero:Alive() or (self.timber:GetPos() - self.hero:GetPos()):Length2D() <= self.velocity * 3
+    return not self.hero:Alive() or (self.dashTarget:GetPos() - self.hero:GetPos()):Length2D() <= self.velocity * 3
 end
 
 function DashTimberE:End(...)
@@ -202,6 +207,6 @@ function DashTimberE:End(...)
     ParticleManager:DestroyParticle(self.particle, true)
     ParticleManager:ReleaseParticleIndex(self.particle)
 
-    self.timber:StopSound("Arena.Timber.CastE")
+    self.dashTarget:StopSound("Arena.Timber.CastE")
     self.hero:GetWearableBySlot("weapon"):RemoveEffects(EF_NODRAW)
 end
